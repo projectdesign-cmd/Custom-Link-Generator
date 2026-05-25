@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "http://file-to-link-stevebotz-01.koyeb.app/$1"
+    }
+  ]
+}
