@@ -1,5 +1,20 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/api/proxy?url=$1" }
+  "redirects": [
+    {
+      "source": "/magas/:path*",
+      "destination": "https://magas.rest/:path*"
+    },
+    {
+      "source": "/koyeb/:path*",
+      "destination": "http://file-to-link-stevebotz-01.koyeb.app/:path*"
+    },
+    {
+      "source": "/heroku/:path*",
+      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*"
+    },
+    {
+      "source": "/filedollar/:path*",
+      "destination": "https://filedollar.top/:path*"
+    }
   ]
 }
