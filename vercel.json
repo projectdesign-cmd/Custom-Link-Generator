@@ -3,14 +3,18 @@
     {
       "source": "/(.*)",
       "destination": "http://file-to-link-stevebotz-01.koyeb.app/$1"
-    }
-  ]
-}
-{
-  "rewrites": [
+    },
     {
       "source": "/(.*)",
       "destination": "https://magas.rest/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "https://filedollar.top/$1"
     }
   ]
 }
