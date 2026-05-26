@@ -1,45 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Custom Link Generator</title>
-</head>
+<head><title>Redirecting...</title></head>
 <body>
-  <h1>Custom Link Generator</h1>
-  
-  <label for="baseUrl">Base URL:</label>
-  <input type="text" id="baseUrl" placeholder="e.g., https://example.com">
-  <br><br>
-  
-  <label for="paramName">Parameter Name:</label>
-  <input type="text" id="paramName" placeholder="e.g., query">
-  <br><br>
-  
-  <label for="inputValue">Input Value:</label>
-  <input type="text" id="inputValue" placeholder="Enter your value">
-  <br><br>
-  
-  <button onclick="generateCustomLink()">Generate Link</button>
-  
-  <p>Your Custom Link: <a id="outputLink" href="#" target="_blank"></a></p>
-  
-  <script>
-    function generateCustomLink() {
-      const baseUrl = document.getElementById('baseUrl').value.trim();
-      const param = document.getElementById('paramName').value.trim() || 'q';
-      const inputVal = document.getElementById('inputValue').value.trim();
-
-      if (!baseUrl) {
-        alert('Please enter a base URL.');
-        return;
-      }
-      
-      const separator = baseUrl.includes('?') ? '&' : '?';
-      const url = `${baseUrl}${separator}${encodeURIComponent(param)}=${encodeURIComponent(inputVal)}`;
-      
-      const linkElement = document.getElementById('outputLink');
-      linkElement.href = url;
-      linkElement.innerText = url;
-    }
-  </script>
+<script>
+  window.location.href = '/';
+</script>
 </body>
 </html>
