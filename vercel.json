@@ -1,7 +1,7 @@
 {
   "redirects": [
     {
-      "source": "/files/:path*",
+      "source": "/kmcgfiles/:path*",
       "destination": "https://magas.rest/:path*",
       "permanent": false
     },
