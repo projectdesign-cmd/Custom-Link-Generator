@@ -1,20 +1,24 @@
 {
   "redirects": [
     {
-      "source": "/magas/:path*",
-      "destination": "https://magas.rest/:path*"
+      "source": "/files/:path*",
+      "destination": "https://magas.rest/:path*",
+      "permanent": false
     },
     {
       "source": "/koyeb/:path*",
-      "destination": "http://file-to-link-stevebotz-01.koyeb.app/:path*"
+      "destination": "http://file-to-link-stevebotz-01.koyeb.app/:path*",
+      "permanent": false
     },
     {
       "source": "/heroku/:path*",
-      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*"
+      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*",
+      "permanent": false
     },
     {
       "source": "/filedollar/:path*",
-      "destination": "https://filedollar.top/:path*"
+      "destination": "https://filedollar.top/:path*",
+      "permanent": false
     }
   ]
 }
