@@ -1,0 +1,77 @@
+name: Ultra Fast Video Downloader
+
+on:
+  push:
+    paths:
+      - 'links.txt'
+  workflow_dispatch:
+
+jobs:
+  download-and-edit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Tools
+        run: |
+          sudo apt-get install -y ffmpeg aria2
+
+      - name: Download & Edit Metadata
+        run: |
+          mkdir -p output
+          while IFS= read -r url || [[ -n "$url" ]]; do
+            [[ -z "$url" ]] && continue
+            filename=$(basename "$url" | cut -d'?' -f1)
+            filename=$(python3 -c "import urllib.parse; print(urllib.parse.unquote_plus('$filename'))")
+            ext="${filename##*.}"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "⬇️ Downloading: $filename"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            aria2c \
+              --dir=/tmp \
+              --out="temp_$filename" \
+              --split=32 \
+              --max-connection-per-server=32 \
+              --min-split-size=512K \
+              --max-overall-download-limit=0 \
+              --max-download-limit=0 \
+              --file-allocation=none \
+              --continue=true \
+              --retry-wait=2 \
+              --max-tries=10 \
+              "$url"
+            echo "✏️ Editing Metadata: $filename"
+            if [ "$ext" = "mkv" ]; then
+              ffmpeg -y \
+                -i "/tmp/temp_$filename" \
+                -map 0 \
+                -map_metadata 0 \
+                -metadata:s:a:0 title="Exclusive File Z" \
+                -metadata:s:a:0 handler_name="Exclusive File Z" \
+                -c copy \
+                "output/$filename"
+            else
+              ffmpeg -y \
+                -i "/tmp/temp_$filename" \
+                -map 0 \
+                -map_metadata 0 \
+                -metadata:s:a:0 title="Exclusive File Z" \
+                -metadata:s:a:0 handler_name="Exclusive File Z" \
+                -c:v copy \
+                -c:a copy \
+                -c:s mov_text \
+                "output/$filename"
+            fi
+            rm -f "/tmp/temp_$filename"
+            echo "✅ Done: $filename"
+          done < links.txt
+
+      - name: Upload Edited Videos
+        uses: actions/upload-artifact@v4
+        with:
+          name: Edited-Videos
+          path: output/
+          retention-days: 7
