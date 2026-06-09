@@ -6,6 +6,9 @@ on:
       - 'links.txt'
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   download-and-edit:
     runs-on: ubuntu-latest
@@ -17,32 +20,26 @@ jobs:
 
       - name: Install Tools
         run: |
-          sudo apt-get install -y ffmpeg aria2
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg aria2 wget
 
       - name: Download & Edit Metadata
         run: |
           mkdir -p output
           while IFS= read -r url || [[ -n "$url" ]]; do
             [[ -z "$url" ]] && continue
+            [[ "$url" == \#* ]] && continue
             filename=$(basename "$url" | cut -d'?' -f1)
-            filename=$(python3 -c "import urllib.parse; print(urllib.parse.unquote_plus('$filename'))")
+            filename=$(python3 -c "import urllib.parse, sys; print(urllib.parse.unquote_plus(sys.argv[1]))" "$filename")
             ext="${filename##*.}"
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "⬇️ Downloading: $filename"
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            aria2c \
-              --dir=/tmp \
-              --out="temp_$filename" \
-              --split=32 \
-              --max-connection-per-server=32 \
-              --min-split-size=512K \
-              --max-overall-download-limit=0 \
-              --max-download-limit=0 \
-              --file-allocation=none \
-              --continue=true \
-              --retry-wait=2 \
-              --max-tries=10 \
-              "$url"
+            wget -O "/tmp/temp_$filename" "$url"
+            if [ $? -ne 0 ]; then
+              echo "❌ Download failed: $filename"
+              continue
+            fi
             echo "✏️ Editing Metadata: $filename"
             if [ "$ext" = "mkv" ]; then
               ffmpeg -y \
