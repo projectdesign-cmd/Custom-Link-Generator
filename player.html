@@ -8,45 +8,41 @@ const infoEl = document.getElementById("info");
 const dlBtn = document.getElementById("dlbtn");
 const proxyBtn = document.getElementById("proxybtn");
 
-titleEl.textContent = title;
-document.title = title;
-
-if (!rawUrl) {
-    titleEl.textContent = "No video URL provided!";
-    infoEl.textContent = "Add ?url=YOUR_VIDEO_LINK to the URL";
+if (!video || !titleEl || !infoEl || !dlBtn || !proxyBtn) {
+    console.error("Required HTML elements not found.");
 } else {
-    const proxyUrl =
-        "https://corsproxy.io/?" + encodeURIComponent(rawUrl);
 
-    dlBtn.href = rawUrl;
+    titleEl.textContent = title;
+    document.title = title;
 
-    proxyBtn.href =
-        "https://www.hlsplayer.net/play?url=" +
-        encodeURIComponent(rawUrl);
+    if (!rawUrl) {
+        titleEl.textContent = "No video URL provided!";
+        infoEl.textContent = "Add ?url=YOUR_VIDEO_LINK to the URL";
+    } else {
 
-    function loadVideo(url) {
-        video.src = url;
-        video.load();
+        const proxyUrl =
+            "https://corsproxy.io/?" + encodeURIComponent(rawUrl);
 
-        const playPromise = video.play();
+        dlBtn.href = rawUrl;
 
-        if (playPromise !== undefined) {
-            playPromise.catch(() => {
-                console.log("Autoplay blocked by browser.");
+        proxyBtn.href =
+            "https://www.hlsplayer.net/play?url=" +
+            encodeURIComponent(rawUrl);
+
+        function loadVideo(url) {
+            video.src = url;
+            video.load();
+
+            video.play().catch(() => {
+                console.log("Autoplay blocked.");
             });
         }
+
+        loadVideo(rawUrl);
+
+        video.addEventListener("error", () => {
+            infoEl.textContent = "Direct source failed. Trying proxy...";
+            loadVideo(proxyUrl);
+        }, { once: true });
     }
-
-    // Load direct source first
-    loadVideo(rawUrl);
-
-    // If loading fails, try proxy
-    video.onerror = function () {
-        infoEl.textContent = "Direct source failed. Trying proxy...";
-        video.onerror = function () {
-            infoEl.textContent =
-                "Playback failed. Use Download or Proxy Player.";
-        };
-        loadVideo(proxyUrl);
-    };
 }
