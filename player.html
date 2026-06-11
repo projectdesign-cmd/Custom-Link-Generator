@@ -6,34 +6,36 @@
 <title>Video Player</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #000; color: #fff; font-family: Arial, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-h1 { font-size: 18px; margin-bottom: 10px; text-align: center; padding: 10px; }
-video { width: 100%; max-width: 900px; height: auto; background: #000; }
+body { background: #111; color: #fff; font-family: Arial, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+h1 { font-size: 16px; margin-bottom: 10px; text-align: center; padding: 10px; color: #eee; }
 .container { width: 100%; max-width: 900px; padding: 10px; }
-.error { color: red; text-align: center; padding: 20px; }
+.btn { display: inline-block; margin-top: 15px; padding: 12px 24px; background: #e50914; color: #fff; border-radius: 6px; text-decoration: none; font-size: 16px; text-align: center; width: 100%; }
+.btn:hover { background: #c40812; }
+.info { margin-top: 10px; font-size: 13px; color: #aaa; text-align: center; }
+video { width: 100%; max-width: 900px; height: auto; background: #000; border-radius: 8px; }
 </style>
 </head>
 <body>
 <div class="container">
 <h1 id="title">Loading...</h1>
-<video id="player" controls autoplay>
-  <source id="source" src="" type="video/mp4">
+<video id="player" controls autoplay controlsList="nodownload">
   Your browser does not support the video tag.
 </video>
-<p class="error" id="error"></p>
+<a id="dlbtn" class="btn" href="#" target="_blank">⬇️ Download Video</a>
+<p class="info">If video does not play, use the Download button</p>
 </div>
 <script>
 const params = new URLSearchParams(window.location.search);
 const url = params.get("url");
-const title = params.get("title");
+const title = params.get("title") || "Video Player";
+document.getElementById("title").innerText = title;
+document.title = title;
+document.getElementById("dlbtn").href = url;
 if (url) {
-  document.getElementById("source").src = url;
-  document.getElementById("player").load();
-  document.getElementById("title").innerText = title || "Video Player";
-  document.title = title || "Video Player";
-} else {
-  document.getElementById("title").innerText = "No video URL provided!";
-  document.getElementById("error").innerText = "Please add ?url=YOUR_VIDEO_LINK to the URL";
+  const video = document.getElementById("player");
+  video.src = url;
+  video.load();
+  video.play().catch(() => {});
 }
 </script>
 </body>
