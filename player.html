@@ -9,33 +9,52 @@
 body { background: #111; color: #fff; font-family: Arial, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 h1 { font-size: 16px; margin-bottom: 10px; text-align: center; padding: 10px; color: #eee; }
 .container { width: 100%; max-width: 900px; padding: 10px; }
-.btn { display: inline-block; margin-top: 15px; padding: 12px 24px; background: #e50914; color: #fff; border-radius: 6px; text-decoration: none; font-size: 16px; text-align: center; width: 100%; }
-.btn:hover { background: #c40812; }
-.info { margin-top: 10px; font-size: 13px; color: #aaa; text-align: center; }
+.btn { display: inline-block; margin-top: 10px; padding: 12px 24px; background: #e50914; color: #fff; border-radius: 6px; text-decoration: none; font-size: 16px; text-align: center; width: 100%; }
+.btn2 { background: #1a73e8; margin-top: 8px; }
 video { width: 100%; max-width: 900px; height: auto; background: #000; border-radius: 8px; }
+.info { margin-top: 8px; font-size: 12px; color: #aaa; text-align: center; }
 </style>
 </head>
 <body>
 <div class="container">
 <h1 id="title">Loading...</h1>
-<video id="player" controls autoplay controlsList="nodownload">
+<video id="player" controls autoplay playsinline>
   Your browser does not support the video tag.
 </video>
 <a id="dlbtn" class="btn" href="#" target="_blank">⬇️ Download Video</a>
-<p class="info">If video does not play, use the Download button</p>
+<a id="proxybtn" class="btn btn2" href="#" target="_blank">▶️ Try Proxy Player</a>
+<p class="info" id="info">If video does not play, tap Download or Try Proxy Player</p>
 </div>
 <script>
 const params = new URLSearchParams(window.location.search);
-const url = params.get("url");
+const rawUrl = params.get("url");
 const title = params.get("title") || "Video Player";
+
 document.getElementById("title").innerText = title;
 document.title = title;
-document.getElementById("dlbtn").href = url;
-if (url) {
+
+if (rawUrl) {
+  const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(rawUrl);
   const video = document.getElementById("player");
-  video.src = url;
+
+  // Try direct first
+  video.src = rawUrl;
   video.load();
-  video.play().catch(() => {});
+  video.play().catch(() => {
+    // If direct fails, try proxy
+    document.getElementById("info").innerText = "Direct failed. Trying proxy...";
+    video.src = proxyUrl;
+    video.load();
+    video.play().catch(() => {
+      document.getElementById("info").innerText = "Use Download or Proxy Player button below!";
+    });
+  });
+
+  document.getElementById("dlbtn").href = rawUrl;
+  document.getElementById("proxybtn").href = "https://www.hlsplayer.net/play?url=" + encodeURIComponent(rawUrl);
+} else {
+  document.getElementById("title").innerText = "No video URL provided!";
+  document.getElementById("info").innerText = "Add ?url=YOUR_VIDEO_LINK to the URL";
 }
 </script>
 </body>
