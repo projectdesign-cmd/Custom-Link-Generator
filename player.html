@@ -1,5 +1,5 @@
 const params = new URLSearchParams(window.location.search);
-const rawUrl = params.get("url");
+const rawUrl = decodeURIComponent(params.get("url") || "");
 const title = params.get("title") || "Video Player";
 
 const video = document.getElementById("player");
@@ -17,7 +17,7 @@ if (!video || !titleEl || !infoEl || !dlBtn || !proxyBtn) {
 
     if (!rawUrl) {
         titleEl.textContent = "No video URL provided!";
-        infoEl.textContent = "Add ?url=YOUR_VIDEO_LINK to the URL";
+        infoEl.textContent = "Add ?url=YOUR_VIDEO_LINK";
     } else {
 
         const proxyUrl =
@@ -29,20 +29,33 @@ if (!video || !titleEl || !infoEl || !dlBtn || !proxyBtn) {
             "https://www.hlsplayer.net/play?url=" +
             encodeURIComponent(rawUrl);
 
+        let proxyTried = false;
+
         function loadVideo(url) {
             video.src = url;
             video.load();
 
             video.play().catch(() => {
-                console.log("Autoplay blocked.");
+                console.log("Autoplay blocked");
             });
         }
 
         loadVideo(rawUrl);
 
-        video.addEventListener("error", () => {
-            infoEl.textContent = "Direct source failed. Trying proxy...";
-            loadVideo(proxyUrl);
-        }, { once: true });
+        video.onerror = () => {
+            if (!proxyTried) {
+                proxyTried = true;
+                infoEl.textContent =
+                    "Direct stream failed. Trying proxy...";
+                loadVideo(proxyUrl);
+            } else {
+                infoEl.textContent =
+                    "Playback failed. Use Download button.";
+            }
+        };
+
+        video.onloadeddata = () => {
+            infoEl.textContent = "Video loaded successfully";
+        };
     }
 }
