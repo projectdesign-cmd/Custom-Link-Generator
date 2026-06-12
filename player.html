@@ -1,4 +1,4 @@
-hereu<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -44,4 +44,83 @@ video.fit{position:fixed;top:0;left:0;width:100vw;height:100vh;max-height:100vh;
   <div class="controls-bar">
     <button class="ctrl-btn" onclick="togglePlay()" id="playIcon">▶</button>
     <span class="time" id="timeDisplay">00:00 / 00:00</span>
-    <input class="vol-slider" type="range" min="0" max="1" step="0.1" value="1" oninput=
+    <input class="vol-slider" type="range" min="0" max="1" step="0.1" value="1" oninput="setVol(this.value)">
+    <button class="fullbtn" onclick="toggleFit()">⛶</button>
+  </div>
+</div>
+
+<div class="info-box">
+  <div class="file-title" id="title">Loading...</div>
+  <div class="meta">
+    <span class="size-badge" id="sizeBadge">...</span>
+    <span class="quality">HD</span>
+  </div>
+  <button class="btn-fit" onclick="toggleFit()">⛶ Fit to Screen</button>
+  <a id="dlbtn" class="btn-dl" href="#" target="_blank">
+    <span>⬇</span> Download
+  </a>
+  <button class="btn-copy" onclick="copyLink()">
+    <span>🔗</span> Copy Link
+  </button>
+  <div class="copied" id="copied">✅ Link Copied!</div>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const rawUrl = params.get("url");
+const title = params.get("title") || "Video";
+const size = params.get("size") || "";
+
+document.getElementById("title").innerText = title;
+document.title = title;
+if(size) document.getElementById("sizeBadge").innerText = size;
+
+const video = document.getElementById("player");
+const playBtn = document.getElementById("playBtn");
+const playIcon = document.getElementById("playIcon");
+let isFit = false;
+
+function togglePlay(){
+  if(video.paused){ video.play(); playBtn.style.opacity="0"; playIcon.innerText="⏸"; }
+  else { video.pause(); playBtn.style.opacity="1"; playIcon.innerText="▶"; }
+}
+
+video.ontimeupdate = () => {
+  const p = (video.currentTime/video.duration)*100 || 0;
+  document.getElementById("progress").style.width = p + "%";
+  document.getElementById("timeDisplay").innerText = fmt(video.currentTime) + " / " + fmt(video.duration);
+};
+
+function fmt(s){ if(!s||isNaN(s)) return "00:00"; const m=Math.floor(s/60); const sec=Math.floor(s%60); return (m<10?"0":"")+m+":"+(sec<10?"0":"")+sec; }
+
+function seekVideo(e){ const r=e.currentTarget.getBoundingClientRect(); video.currentTime=(e.clientX-r.left)/r.width*video.duration; }
+
+function setVol(v){ video.volume=v; }
+
+function toggleFit(){
+  isFit=!isFit;
+  video.classList.toggle("fit",isFit);
+  if(isFit){ video.play(); playBtn.style.opacity="0"; }
+}
+
+function copyLink(){
+  navigator.clipboard.writeText(rawUrl).then(()=>{
+    document.getElementById("copied").style.display="block";
+    setTimeout(()=>{ document.getElementById("copied").style.display="none"; },2000);
+  });
+}
+
+if(rawUrl){
+  document.getElementById("dlbtn").href = rawUrl;
+  video.src = rawUrl;
+  video.load();
+  video.onerror = () => {
+    video.src = "/api/proxy?url=" + encodeURIComponent(rawUrl);
+    video.load();
+  };
+} else {
+  document.getElementById("title").innerText = "No URL provided!";
+}
+</script>
+</body>
+</html>
