@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Video Player</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -80,41 +80,75 @@ const playBtn = document.getElementById("playBtn");
 const playIcon = document.getElementById("playIcon");
 let isFit = false;
 
-function togglePlay(){
-  if(video.paused){ video.play(); playBtn.style.opacity="0"; playIcon.innerText="⏸"; }
-  else { video.pause(); playBtn.style.opacity="1"; playIcon.innerText="▶"; }
+function togglePlay() {
+  if (video.paused) {
+    video.play();
+    playBtn.style.display = "none";
+    playIcon.innerText = "⏸";
+  } else {
+    video.pause();
+    playBtn.style.display = "flex";
+    playIcon.innerText = "▶";
+  }
 }
 
 video.ontimeupdate = () => {
-  const p = (video.currentTime/video.duration)*100 || 0;
+  const p = (video.currentTime / video.duration) * 100 || 0;
   document.getElementById("progress").style.width = p + "%";
-  document.getElementById("timeDisplay").innerText = fmt(video.currentTime) + " / " + fmt(video.duration);
+  document.getElementById("timeDisplay").innerText =
+    fmt(video.currentTime) + " / " + fmt(video.duration);
 };
 
-function fmt(s){ if(!s||isNaN(s)) return "00:00"; const m=Math.floor(s/60); const sec=Math.floor(s%60); return (m<10?"0":"")+m+":"+(sec<10?"0":"")+sec; }
-
-function seekVideo(e){ const r=e.currentTarget.getBoundingClientRect(); video.currentTime=(e.clientX-r.left)/r.width*video.duration; }
-
-function setVol(v){ video.volume=v; }
-
-function toggleFit(){
-  isFit=!isFit;
-  video.classList.toggle("fit",isFit);
-  if(isFit){ video.play(); playBtn.style.opacity="0"; }
+function fmt(s) {
+  if (!s || isNaN(s)) return "00:00";
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return (m < 10 ? "0" : "") + m + ":" + (sec < 10 ? "0" : "") + sec;
 }
 
-function copyLink(){
-  navigator.clipboard.writeText(rawUrl).then(()=>{
-    document.getElementById("copied").style.display="block";
-    setTimeout(()=>{ document.getElementById("copied").style.display="none"; },2000);
+function seekVideo(e) {
+  const r = e.currentTarget.getBoundingClientRect();
+  const clickX = e.clientX - r.left;
+  const width = r.width;
+  if (video.duration) {
+    video.currentTime = (clickX / width) * video.duration;
+  }
+}
+
+function setVol(v) {
+  video.volume = v;
+}
+
+function toggleFit() {
+  isFit = !isFit;
+  if (isFit) {
+    video.classList.add("fit");
+    video.play();
+    playBtn.style.display = "none";
+  } else {
+    video.classList.remove("fit");
+    video.pause();
+  }
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(rawUrl).then(() => {
+    const copiedMsg = document.getElementById("copied");
+    copiedMsg.style.display = "block";
+    setTimeout(() => {
+      copiedMsg.style.display = "none";
+    }, 2000);
   });
 }
 
-if(rawUrl){
+if (rawUrl) {
   document.getElementById("dlbtn").href = rawUrl;
   video.src = rawUrl;
   video.load();
+  // Optionally autoplay
+  // video.play();
   video.onerror = () => {
+    // fallback to proxy
     video.src = "/api/proxy?url=" + encodeURIComponent(rawUrl);
     video.load();
   };
