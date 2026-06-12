@@ -5,56 +5,61 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Video Player</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #111; color: #fff; font-family: Arial, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-h1 { font-size: 16px; margin-bottom: 10px; text-align: center; padding: 10px; color: #eee; }
-.container { width: 100%; max-width: 900px; padding: 10px; }
-.btn { display: inline-block; margin-top: 10px; padding: 12px 24px; background: #e50914; color: #fff; border-radius: 6px; text-decoration: none; font-size: 16px; text-align: center; width: 100%; }
-.btn2 { background: #1a73e8; margin-top: 8px; }
-video { width: 100%; max-width: 900px; height: auto; background: #000; border-radius: 8px; }
-.info { margin-top: 8px; font-size: 12px; color: #aaa; text-align: center; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.container{width:100%;max-width:900px;padding:15px}
+h1{font-size:15px;margin-bottom:10px;text-align:center;color:#eee;word-break:break-word}
+video{width:100%;background:#000;border-radius:8px}
+.btn{display:block;margin-top:8px;padding:12px;border-radius:6px;text-decoration:none;font-size:15px;text-align:center;color:#fff;cursor:pointer;border:none;width:100%}
+.red{background:#e50914}.blue{background:#1a73e8}.green{background:#1db954}.gray{background:#555}
+.info{margin-top:8px;font-size:12px;color:#aaa;text-align:center}
 </style>
 </head>
 <body>
 <div class="container">
 <h1 id="title">Loading...</h1>
-<video id="player" controls autoplay playsinline>
-  Your browser does not support the video tag.
-</video>
-<a id="dlbtn" class="btn" href="#" target="_blank">⬇️ Download Video</a>
-<a id="proxybtn" class="btn btn2" href="#" target="_blank">▶️ Try Proxy Player</a>
-<p class="info" id="info">If video does not play, tap Download or Try Proxy Player</p>
+<video id="player" controls autoplay playsinline></video>
+<button class="btn red" onclick="tryDirect()">▶️ Play Direct</button>
+<button class="btn blue" onclick="tryProxy1()">▶️ Play Proxy 1</button>
+<button class="btn green" onclick="tryProxy2()">▶️ Play Proxy 2</button>
+<a id="dlbtn" class="btn gray" href="#" target="_blank">⬇️ Download</a>
+<a id="vlcbtn" class="btn gray" href="#" >📱 Open in VLC</a>
+<p class="info" id="info">Trying to play...</p>
 </div>
 <script>
 const params = new URLSearchParams(window.location.search);
 const rawUrl = params.get("url");
 const title = params.get("title") || "Video Player";
-
 document.getElementById("title").innerText = title;
 document.title = title;
+const video = document.getElementById("player");
 
-if (rawUrl) {
-  const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(rawUrl);
-  const video = document.getElementById("player");
+function setInfo(msg){ document.getElementById("info").innerText = msg; }
 
-  // Try direct first
-  video.src = rawUrl;
-  video.load();
-  video.play().catch(() => {
-    // If direct fails, try proxy
-    document.getElementById("info").innerText = "Direct failed. Trying proxy...";
-    video.src = proxyUrl;
-    video.load();
-    video.play().catch(() => {
-      document.getElementById("info").innerText = "Use Download or Proxy Player button below!";
-    });
-  });
+function tryDirect(){
+  video.src = rawUrl;
+  video.load();
+  video.play().then(()=>setInfo("Playing directly!")).catch(()=>setInfo("Direct failed! Try Proxy 1"));
+}
 
-  document.getElementById("dlbtn").href = rawUrl;
-  document.getElementById("proxybtn").href = "https://www.hlsplayer.net/play?url=" + encodeURIComponent(rawUrl);
+function tryProxy1(){
+  video.src = "https://corsproxy.io/?" + encodeURIComponent(rawUrl);
+  video.load();
+  video.play().then(()=>setInfo("Playing via Proxy 1!")).catch(()=>setInfo("Proxy 1 failed! Try Proxy 2"));
+}
+
+function tryProxy2(){
+  video.src = "https://api.allorigins.win/raw?url=" + encodeURIComponent(rawUrl);
+  video.load();
+  video.play().then(()=>setInfo("Playing via Proxy 2!")).catch(()=>setInfo("Proxy 2 failed! Try Download"));
+}
+
+if(rawUrl){
+  document.getElementById("dlbtn").href = rawUrl;
+  document.getElementById("vlcbtn").href = "vlc://" + rawUrl;
+  tryDirect();
 } else {
-  document.getElementById("title").innerText = "No video URL provided!";
-  document.getElementById("info").innerText = "Add ?url=YOUR_VIDEO_LINK to the URL";
+  setInfo("No URL provided!");
 }
 </script>
 </body>
