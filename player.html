@@ -10,7 +10,6 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center}
 .video-wrap{width:100%;max-width:900px}
-.vjs-default-skin{width:100%!important;height:auto!important}
 .info-box{width:100%;max-width:900px;padding:16px}
 .file-title{font-size:20px;font-weight:bold;line-height:1.3;margin-bottom:10px}
 .meta{display:flex;gap:10px;margin-bottom:16px;align-items:center}
@@ -23,6 +22,7 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .track-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .track-btn{padding:10px;background:#333;border:none;color:#fff;border-radius:6px;text-align:left;cursor:pointer;font-size:14px}
 .track-btn.active{background:#1a73e8}
+.note{font-size:11px;color:#f90;margin-top:6px}
 video.fit{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;object-fit:contain;background:#000}
 </style>
 </head>
@@ -46,11 +46,11 @@ video.fit{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;obje
   <div class="settings-panel">
     <h3>🔊 Audio Track</h3>
     <div class="track-list" id="audioTracks">
-      <div style="color:#aaa;font-size:13px">Loading audio tracks...</div>
+      <div style="color:#aaa;font-size:13px">No audio info provided</div>
     </div>
     <h3>💬 Subtitles</h3>
     <div class="track-list" id="subTracks">
-      <div style="color:#aaa;font-size:13px">Loading subtitles...</div>
+      <div style="color:#aaa;font-size:13px">No subtitles detected</div>
     </div>
   </div>
 
@@ -62,6 +62,7 @@ const params = new URLSearchParams(window.location.search);
 const rawUrl = params.get("url");
 const title = params.get("title") || "Video";
 const size = params.get("size") || "HD";
+const audioParam = params.get("audio") || "";
 
 document.getElementById("title").innerText = title;
 document.title = title;
@@ -83,30 +84,35 @@ player.on("error", () => {
   player.play();
 });
 
-player.on("loadedmetadata", () => {
-  // Audio Tracks
+// Manual Audio Tracks from URL parameter
+if(audioParam) {
   const audioDiv = document.getElementById("audioTracks");
-  const tracks = player.audioTracks();
-  if(tracks && tracks.length > 0){
-    audioDiv.innerHTML = "";
-    for(let i=0; i<tracks.length; i++){
-      const t = tracks[i];
-      const btn = document.createElement("button");
-      btn.className = "track-btn" + (t.enabled ? " active" : "");
-      btn.innerText = "🔊 " + (t.label || "Audio "+(i+1)) + (t.language ? " ["+t.language+"]" : "");
-      btn.onclick = () => {
+  const audioTracks = audioParam.split(",");
+  audioDiv.innerHTML = "";
+  audioTracks.forEach((name, i) => {
+    const btn = document.createElement("button");
+    btn.className = "track-btn" + (i===0 ? " active" : "");
+    btn.innerText = "🔊 " + name.trim();
+    btn.onclick = () => {
+      document.querySelectorAll("#audioTracks .track-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      // Try switching audio track
+      const tracks = player.audioTracks();
+      if(tracks && tracks.length > i){
         for(let j=0; j<tracks.length; j++) tracks[j].enabled = false;
-        t.enabled = true;
-        document.querySelectorAll("#audioTracks .track-btn").forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-      };
-      audioDiv.appendChild(btn);
-    }
-  } else {
-    audioDiv.innerHTML = "<div style='color:#aaa;font-size:13px'>No audio tracks detected</div>";
-  }
+        tracks[i].enabled = true;
+      }
+    };
+    audioDiv.appendChild(btn);
+  });
+  const note = document.createElement("p");
+  note.className = "note";
+  note.innerText = "⚠️ Audio switching may not work in all browsers";
+  audioDiv.appendChild(note);
+}
 
-  // Subtitles
+// Auto detect subtitles
+player.on("loadedmetadata", () => {
   const subDiv = document.getElementById("subTracks");
   const textTracks = player.textTracks();
   const subs = [];
@@ -136,8 +142,6 @@ player.on("loadedmetadata", () => {
       };
       subDiv.appendChild(btn);
     });
-  } else {
-    subDiv.innerHTML = "<div style='color:#aaa;font-size:13px'>No subtitles detected</div>";
   }
 });
 
