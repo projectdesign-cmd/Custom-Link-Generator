@@ -15,9 +15,16 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .meta{display:flex;gap:10px;margin-bottom:16px;align-items:center}
 .size-badge{background:#333;color:#fff;font-size:13px;padding:3px 10px;border-radius:4px}
 .quality{color:#aaa;font-size:14px}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.btn-view{padding:12px 6px;border:none;color:#fff;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer;text-align:center}
+.btn-view.active{outline:2px solid #fff}
+.blue{background:#1a73e8}
+.orange{background:#e57c00}
 .btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;color:#000;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
-.btn-fit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#1a73e8;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;border:none;cursor:pointer;margin-bottom:10px}
-.settings-panel{background:#222;border-radius:8px;padding:14px;margin-bottom:10px}
+.btn-tg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#229ED9;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
+.btn-fs{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#1a73e8;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;border:none;cursor:pointer;margin-bottom:10px}
+.btn-settings{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#333;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;border:none;cursor:pointer;margin-bottom:10px}
+.settings-panel{background:#222;border-radius:8px;padding:14px;margin-bottom:10px;display:none}
 .settings-panel h3{font-size:14px;color:#aaa;margin-bottom:10px}
 .lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .lang-btn{padding:10px;background:#333;border:none;color:#fff;border-radius:6px;text-align:center;cursor:pointer;font-size:14px;text-decoration:none;display:block}
@@ -25,7 +32,7 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .sub-list{display:flex;flex-direction:column;gap:6px}
 .sub-btn{padding:10px;background:#333;border:none;color:#fff;border-radius:6px;text-align:left;cursor:pointer;font-size:14px}
 .sub-btn.active{background:#1db954}
-video.fit{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;object-fit:contain;background:#000}
+.vjs-tech{transition:object-fit 0.2s}
 </style>
 </head>
 <body>
@@ -43,11 +50,19 @@ video.fit{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;obje
     <span class="quality">HD</span>
   </div>
 
-  <button class="btn-fit" onclick="toggleFit()">⛶ Fit to Screen</button>
+  <div class="btn-row">
+    <button class="btn-view blue active" id="btn-contain" onclick="setFit('contain')">⬜ Best Fit</button>
+    <button class="btn-view orange" id="btn-cover" onclick="setFit('cover')">▣ Fill</button>
+  </div>
 
-  <div class="settings-panel" id="langPanel" style="display:none">
+  <button class="btn-fs" onclick="goFullscreen()">⛶ Full Screen</button>
+  <button class="btn-settings" onclick="toggleSettings()">⚙️ Settings</button>
+
+  <div class="settings-panel" id="langPanel">
     <h3>🔊 Audio Language</h3>
-    <div class="lang-grid" id="langList"></div>
+    <div class="lang-grid" id="langList">
+      <div style="color:#aaa;font-size:13px">No languages provided</div>
+    </div>
     <h3>💬 Subtitles</h3>
     <div class="sub-list" id="subTracks">
       <div style="color:#aaa;font-size:13px">No subtitles detected</div>
@@ -55,6 +70,7 @@ video.fit{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;obje
   </div>
 
   <a id="dlbtn" class="btn-dl" href="#" target="_blank">⬇ Download</a>
+  <a class="btn-tg" href="https://t.me/MadForEachOtherShow" target="_blank">📢 Join Telegram Channel</a>
 </div>
 
 <script>
@@ -70,7 +86,7 @@ document.title = title;
 document.getElementById("sizeBadge").innerText = size;
 document.getElementById("dlbtn").href = rawUrl || "#";
 
-let isFit = false;
+let settingsOpen = false;
 
 const player = videojs("player", {
   sources: [{ src: rawUrl, type: "video/mp4" }],
@@ -85,10 +101,31 @@ player.on("error", () => {
   player.play();
 });
 
-// Language buttons from URL
-// Format: langs=Hindi|URL1,Telugu|URL2,Tamil|URL3,Malayalam|URL4
+function setFit(mode){
+  const v = document.querySelector(".vjs-tech");
+  if(v) v.style.objectFit = mode;
+  document.getElementById("btn-contain").classList.toggle("active", mode==="contain");
+  document.getElementById("btn-cover").classList.toggle("active", mode==="cover");
+}
+
+function goFullscreen(){
+  const wrap = document.querySelector(".video-wrap");
+  if(document.fullscreenElement||document.webkitFullscreenElement){
+    if(document.exitFullscreen) document.exitFullscreen();
+    else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+  } else {
+    if(wrap.requestFullscreen) wrap.requestFullscreen();
+    else if(wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
+    else if(document.querySelector("video").webkitEnterFullscreen) document.querySelector("video").webkitEnterFullscreen();
+  }
+}
+
+function toggleSettings(){
+  settingsOpen = !settingsOpen;
+  document.getElementById("langPanel").style.display = settingsOpen ? "block" : "none";
+}
+
 if(langParam){
-  document.getElementById("langPanel").style.display = "block";
   const langDiv = document.getElementById("langList");
   langDiv.innerHTML = "";
   const langs = langParam.split(",");
@@ -100,7 +137,6 @@ if(langParam){
     const btn = document.createElement("a");
     btn.className = "lang-btn" + (isActive ? " active" : "");
     btn.innerText = "🔊 " + name;
-    // Build new watch link with selected language
     const newParams = new URLSearchParams(params);
     newParams.set("url", url);
     newParams.set("lang", name);
@@ -109,13 +145,12 @@ if(langParam){
   });
 }
 
-// Subtitles
 player.on("loadedmetadata", () => {
   const subDiv = document.getElementById("subTracks");
   const textTracks = player.textTracks();
   const subs = [];
   for(let i=0; i<textTracks.length; i++){
-    if(textTracks[i].kind === "subtitles" || textTracks[i].kind === "captions") subs.push(textTracks[i]);
+    if(textTracks[i].kind==="subtitles"||textTracks[i].kind==="captions") subs.push(textTracks[i]);
   }
   if(subs.length > 0){
     subDiv.innerHTML = "";
@@ -123,33 +158,26 @@ player.on("loadedmetadata", () => {
     offBtn.className = "sub-btn active";
     offBtn.innerText = "❌ Off";
     offBtn.onclick = () => {
-      subs.forEach(t => t.mode = "hidden");
+      subs.forEach(t=>t.mode="hidden");
       document.querySelectorAll(".sub-btn").forEach(b=>b.classList.remove("active"));
       offBtn.classList.add("active");
     };
     subDiv.appendChild(offBtn);
-    subs.forEach((t, i) => {
+    subs.forEach((t,i) => {
       const btn = document.createElement("button");
       btn.className = "sub-btn";
-      btn.innerText = "💬 " + (t.label || "Subtitle "+(i+1));
+      btn.innerText = "💬 "+(t.label||"Subtitle "+(i+1));
       btn.onclick = () => {
-        subs.forEach(s => s.mode = "hidden");
-        t.mode = "showing";
+        subs.forEach(s=>s.mode="hidden");
+        t.mode="showing";
         document.querySelectorAll(".sub-btn").forEach(b=>b.classList.remove("active"));
         btn.classList.add("active");
       };
       subDiv.appendChild(btn);
     });
-    document.getElementById("langPanel").style.display = "block";
+    document.getElementById("langPanel").style.display="block";
   }
 });
-
-function toggleFit(){
-  isFit = !isFit;
-  const v = document.querySelector("video");
-  v.classList.toggle("fit", isFit);
-  if(isFit) player.play();
-}
 </script>
 </body>
 </html>
