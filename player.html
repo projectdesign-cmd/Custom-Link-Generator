@@ -4,51 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Video Player</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video-js.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center}
-.video-wrap{width:100%;max-width:900px;position:relative;background:#000}
-video{width:100%;display:block;max-height:280px;object-fit:contain;background:#000}
-.play-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,150,255,0.85);border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity 0.3s}
-.play-overlay svg{width:30px;height:30px;fill:#fff;margin-left:5px}
-.progress-bar{width:100%;height:4px;background:#333;cursor:pointer}
-.progress{height:4px;background:red;width:0%}
-.controls-bar{display:flex;align-items:center;gap:10px;padding:6px 10px;background:#1a1a1a}
-.ctrl-btn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer}
-.time{font-size:12px;color:#aaa;white-space:nowrap}
-.vol-slider{width:70px;accent-color:red}
-.fullbtn{margin-left:auto;background:none;border:none;color:#fff;font-size:18px;cursor:pointer}
+.video-wrap{width:100%;max-width:900px}
+.vjs-default-skin{width:100%!important;height:auto!important}
 .info-box{width:100%;max-width:900px;padding:16px}
 .file-title{font-size:20px;font-weight:bold;line-height:1.3;margin-bottom:10px}
 .meta{display:flex;gap:10px;margin-bottom:16px;align-items:center}
 .size-badge{background:#333;color:#fff;font-size:13px;padding:3px 10px;border-radius:4px}
 .quality{color:#aaa;font-size:14px}
-.btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;color:#000;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px;border:none;cursor:pointer}
+.btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;color:#000;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
 .btn-fit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#1a73e8;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;border:none;cursor:pointer;margin-bottom:10px}
-.btn-settings{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#333;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;border:none;cursor:pointer;margin-bottom:10px}
-.settings-panel{background:#222;border-radius:8px;padding:14px;margin-bottom:10px;display:none}
+.settings-panel{background:#222;border-radius:8px;padding:14px;margin-bottom:10px}
 .settings-panel h3{font-size:14px;color:#aaa;margin-bottom:10px}
 .track-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .track-btn{padding:10px;background:#333;border:none;color:#fff;border-radius:6px;text-align:left;cursor:pointer;font-size:14px}
 .track-btn.active{background:#1a73e8}
-video.fit{position:fixed;top:0;left:0;width:100vw;height:100vh;max-height:100vh;z-index:9999;object-fit:contain;background:#000}
+video.fit{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;object-fit:contain;background:#000}
 </style>
 </head>
 <body>
 <div class="video-wrap">
-  <video id="player" playsinline></video>
-  <div class="play-overlay" id="playBtn" onclick="togglePlay()">
-    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-  </div>
-  <div class="progress-bar" onclick="seekVideo(event)">
-    <div class="progress" id="progress"></div>
-  </div>
-  <div class="controls-bar">
-    <button class="ctrl-btn" onclick="togglePlay()" id="playIcon">▶</button>
-    <span class="time" id="timeDisplay">00:00 / 00:00</span>
-    <input class="vol-slider" type="range" min="0" max="1" step="0.1" value="1" oninput="setVol(this.value)">
-    <button class="fullbtn" onclick="toggleFit()">⛶</button>
-  </div>
+  <video-js id="player" class="vjs-default-skin vjs-big-play-centered"
+    controls autoplay playsinline preload="auto"
+    style="width:100%;min-height:220px">
+  </video-js>
 </div>
 
 <div class="info-box">
@@ -60,16 +43,14 @@ video.fit{position:fixed;top:0;left:0;width:100vw;height:100vh;max-height:100vh;
 
   <button class="btn-fit" onclick="toggleFit()">⛶ Fit to Screen</button>
 
-  <button class="btn-settings" onclick="toggleSettings()">⚙️ Settings</button>
-
-  <div class="settings-panel" id="settingsPanel">
+  <div class="settings-panel">
     <h3>🔊 Audio Track</h3>
     <div class="track-list" id="audioTracks">
-      <div style="color:#aaa;font-size:13px">No audio tracks detected</div>
+      <div style="color:#aaa;font-size:13px">Loading audio tracks...</div>
     </div>
     <h3>💬 Subtitles</h3>
     <div class="track-list" id="subTracks">
-      <div style="color:#aaa;font-size:13px">No subtitles detected</div>
+      <div style="color:#aaa;font-size:13px">Loading subtitles...</div>
     </div>
   </div>
 
@@ -85,89 +66,87 @@ const size = params.get("size") || "HD";
 document.getElementById("title").innerText = title;
 document.title = title;
 document.getElementById("sizeBadge").innerText = size;
+document.getElementById("dlbtn").href = rawUrl || "#";
 
-const video = document.getElementById("player");
-const playBtn = document.getElementById("playBtn");
-const playIcon = document.getElementById("playIcon");
 let isFit = false;
-let settingsOpen = false;
 
-function togglePlay(){
-  if(video.paused){ video.play(); playBtn.style.opacity="0"; playIcon.innerText="⏸"; }
-  else { video.pause(); playBtn.style.opacity="1"; playIcon.innerText="▶"; }
-}
+const player = videojs("player", {
+  sources: [{ src: rawUrl, type: "video/mp4" }],
+  controls: true,
+  autoplay: true,
+  preload: "auto",
+  fluid: true,
+});
 
-video.ontimeupdate = () => {
-  const p = (video.currentTime/video.duration)*100||0;
-  document.getElementById("progress").style.width = p+"%";
-  document.getElementById("timeDisplay").innerText = fmt(video.currentTime)+" / "+fmt(video.duration);
-};
+player.on("error", () => {
+  player.src({ src: "/api/proxy?url=" + encodeURIComponent(rawUrl), type: "video/mp4" });
+  player.play();
+});
 
-video.onloadedmetadata = () => {
+player.on("loadedmetadata", () => {
   // Audio Tracks
   const audioDiv = document.getElementById("audioTracks");
-  if(video.audioTracks && video.audioTracks.length > 0){
+  const tracks = player.audioTracks();
+  if(tracks && tracks.length > 0){
     audioDiv.innerHTML = "";
-    for(let i=0; i<video.audioTracks.length; i++){
-      const t = video.audioTracks[i];
+    for(let i=0; i<tracks.length; i++){
+      const t = tracks[i];
       const btn = document.createElement("button");
-      btn.className = "track-btn" + (t.enabled?" active":"");
-      btn.innerText = "🔊 " + (t.label || "Audio Track "+(i+1)) + (t.language?" ["+t.language+"]":"");
+      btn.className = "track-btn" + (t.enabled ? " active" : "");
+      btn.innerText = "🔊 " + (t.label || "Audio "+(i+1)) + (t.language ? " ["+t.language+"]" : "");
       btn.onclick = () => {
-        for(let j=0; j<video.audioTracks.length; j++) video.audioTracks[j].enabled = false;
+        for(let j=0; j<tracks.length; j++) tracks[j].enabled = false;
         t.enabled = true;
         document.querySelectorAll("#audioTracks .track-btn").forEach(b=>b.classList.remove("active"));
         btn.classList.add("active");
       };
       audioDiv.appendChild(btn);
     }
+  } else {
+    audioDiv.innerHTML = "<div style='color:#aaa;font-size:13px'>No audio tracks detected</div>";
   }
 
   // Subtitles
   const subDiv = document.getElementById("subTracks");
-  if(video.textTracks && video.textTracks.length > 0){
+  const textTracks = player.textTracks();
+  const subs = [];
+  for(let i=0; i<textTracks.length; i++){
+    if(textTracks[i].kind === "subtitles" || textTracks[i].kind === "captions") subs.push(textTracks[i]);
+  }
+  if(subs.length > 0){
     subDiv.innerHTML = "";
-    // Add OFF option
     const offBtn = document.createElement("button");
     offBtn.className = "track-btn active";
     offBtn.innerText = "❌ Off";
     offBtn.onclick = () => {
-      for(let j=0; j<video.textTracks.length; j++) video.textTracks[j].mode="hidden";
+      subs.forEach(t => t.mode = "hidden");
       document.querySelectorAll("#subTracks .track-btn").forEach(b=>b.classList.remove("active"));
       offBtn.classList.add("active");
     };
     subDiv.appendChild(offBtn);
-
-    for(let i=0; i<video.textTracks.length; i++){
-      const t = video.textTracks[i];
+    subs.forEach((t, i) => {
       const btn = document.createElement("button");
       btn.className = "track-btn";
-      btn.innerText = "💬 " + (t.label || "Subtitle "+(i+1)) + (t.language?" ["+t.language+"]":"");
+      btn.innerText = "💬 " + (t.label || "Subtitle "+(i+1)) + (t.language ? " ["+t.language+"]" : "");
       btn.onclick = () => {
-        for(let j=0; j<video.textTracks.length; j++) video.textTracks[j].mode="hidden";
+        subs.forEach(s => s.mode = "hidden");
         t.mode = "showing";
         document.querySelectorAll("#subTracks .track-btn").forEach(b=>b.classList.remove("active"));
         btn.classList.add("active");
       };
       subDiv.appendChild(btn);
-    }
+    });
+  } else {
+    subDiv.innerHTML = "<div style='color:#aaa;font-size:13px'>No subtitles detected</div>";
   }
-};
+});
 
-function fmt(s){ if(!s||isNaN(s)) return "00:00"; const m=Math.floor(s/60); const sec=Math.floor(s%60); return (m<10?"0":"")+m+":"+(sec<10?"0":"")+sec; }
-function seekVideo(e){ const r=e.currentTarget.getBoundingClientRect(); video.currentTime=(e.clientX-r.left)/r.width*video.duration; }
-function setVol(v){ video.volume=v; }
-function toggleFit(){ isFit=!isFit; video.classList.toggle("fit",isFit); if(isFit){ video.play(); playBtn.style.opacity="0"; } }
-function toggleSettings(){ settingsOpen=!settingsOpen; document.getElementById("settingsPanel").style.display=settingsOpen?"block":"none"; }
-
-if(rawUrl){
-  document.getElementById("dlbtn").href = rawUrl;
-  video.src = rawUrl;
-  video.load();
-  video.onerror = () => { video.src = "/api/proxy?url="+encodeURIComponent(rawUrl); video.load(); };
-} else {
-  document.getElementById("title").innerText = "No URL provided!";
+function toggleFit(){
+  isFit = !isFit;
+  const v = document.querySelector("video");
+  v.classList.toggle("fit", isFit);
+  if(isFit) player.play();
 }
 </script>
 </body>
-  </html>
+</html>
