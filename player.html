@@ -18,24 +18,41 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;color:#000;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
 .btn-tg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#229ED9;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
 .vjs-tech{transition:object-fit 0.2s}
+.expired-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;text-align:center;width:100%}
+.exp-icon{font-size:70px;margin-bottom:20px}
+.exp-title{font-size:24px;font-weight:bold;color:#e50914;margin-bottom:10px}
+.exp-msg{color:#aaa;margin-bottom:30px;font-size:15px}
+.exp-btn{display:block;width:100%;max-width:400px;padding:14px 24px;border-radius:8px;text-decoration:none;font-size:16px;font-weight:bold;margin-bottom:10px;text-align:center}
 </style>
 </head>
 <body>
-<div class="video-wrap">
-  <video-js id="player" class="vjs-default-skin vjs-big-play-centered"
-    controls autoplay playsinline preload="auto"
-    style="width:100%;min-height:220px">
-  </video-js>
+
+<div id="mainPlayer" style="width:100%;display:flex;flex-direction:column;align-items:center">
+  <div class="video-wrap">
+    <video-js id="player" class="vjs-default-skin vjs-big-play-centered"
+      controls autoplay playsinline preload="auto"
+      style="width:100%;min-height:220px">
+    </video-js>
+  </div>
+  <div class="info-box">
+    <div class="file-title" id="title">Loading...</div>
+    <div class="meta">
+      <span class="size-badge" id="sizeBadge">HD</span>
+      <span class="quality">HD</span>
+    </div>
+    <a id="dlbtn" class="btn-dl" href="#" target="_blank">⬇ Download</a>
+    <a class="btn-tg" href="https://t.me/MadForEachOtherShow" target="_blank">📢 Join Telegram Channel</a>
+  </div>
 </div>
 
-<div class="info-box">
-  <div class="file-title" id="title">Loading...</div>
-  <div class="meta">
-    <span class="size-badge" id="sizeBadge">HD</span>
-    <span class="quality">HD</span>
+<div id="expiredPage" style="display:none;width:100%">
+  <div class="expired-wrap">
+    <div class="exp-icon">⏰</div>
+    <div class="exp-title">Video Player Expired!</div>
+    <div class="exp-msg">This video player has expired.<br>You can still download the video below!</div>
+    <a id="exp-dl" class="exp-btn" href="#" target="_blank" style="background:#fff;color:#000">⬇ Download Video</a>
+    <a class="exp-btn" href="https://t.me/MadForEachOtherShow" target="_blank" style="background:#229ED9;color:#fff">📢 Join Telegram Channel</a>
   </div>
-  <a id="dlbtn" class="btn-dl" href="#" target="_blank">⬇ Download</a>
-  <a class="btn-tg" href="https://t.me/MadForEachOtherShow" target="_blank">📢 Join Telegram Channel</a>
 </div>
 
 <script>
@@ -43,7 +60,23 @@ const params = new URLSearchParams(window.location.search);
 const rawUrl = params.get("url");
 const title = params.get("title") || "Video";
 const size = params.get("size") || "HD";
+const exp = params.get("exp");
 
+// Set download link on expired page
+document.getElementById("exp-dl").href = rawUrl || "#";
+
+// Check expiry
+if(exp){
+  const now = Math.floor(Date.now()/1000);
+  if(now > parseInt(exp)){
+    document.getElementById("mainPlayer").style.display = "none";
+    document.getElementById("expiredPage").style.display = "block";
+    // Stop script here
+    throw new Error("expired");
+  }
+}
+
+// Set player info
 document.getElementById("title").innerText = title;
 document.title = title;
 document.getElementById("sizeBadge").innerText = size;
