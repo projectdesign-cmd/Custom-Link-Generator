@@ -10,8 +10,6 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center}
 .video-wrap{width:100%;max-width:900px;position:relative}
-.video-wrap:-webkit-full-screen{max-width:100%}
-.video-wrap:fullscreen{max-width:100%}
 .tap-left{position:absolute;top:0;left:0;width:40%;height:100%;z-index:10;cursor:pointer}
 .tap-right{position:absolute;top:0;right:0;width:40%;height:100%;z-index:10;cursor:pointer}
 .tap-indicator{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;padding:8px 14px;border-radius:20px;font-size:14px;font-weight:bold;display:none;pointer-events:none;z-index:20}
@@ -29,6 +27,7 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .exp-title{font-size:24px;font-weight:bold;color:#e50914;margin-bottom:10px}
 .exp-msg{color:#aaa;margin-bottom:30px;font-size:15px}
 .exp-btn{display:block;width:100%;max-width:400px;padding:14px 24px;border-radius:8px;text-decoration:none;font-size:16px;font-weight:bold;margin-bottom:10px;text-align:center}
+.vjs-fit-button{font-size:16px!important;cursor:pointer;min-width:2em!important}
 </style>
 </head>
 <body>
@@ -113,59 +112,73 @@ player.on("error", () => {
   player.play();
 });
 
-// Add custom settings button to video player controls
+// Add Fit/Fill button inside video controls
 player.ready(() => {
-  const controlBar = player.getChild("ControlBar");
-
-  // Full Screen already in video.js controls ✅
-
-  // Add Fit/Fill toggle button
-  const fitBtn = player.controlBar.addChild("button", {}, controlBar.children().length - 1);
-  fitBtn.addClass("vjs-fit-button");
-  fitBtn.el().innerHTML = "⬜";
-  fitBtn.el().title = "Best Fit";
-  fitBtn.el().style.cssText = "font-size:16px;cursor:pointer;padding:0 8px";
-
-  let isFill = false;
-  fitBtn.on("click", () => {
-    isFill = !isFill;
-    const v = document.querySelector(".vjs-tech");
-    if(v) v.style.objectFit = isFill ? "cover" : "contain";
-    fitBtn.el().innerHTML = isFill ? "▣" : "⬜";
-    fitBtn.el().title = isFill ? "Fill Screen" : "Best Fit";
+  const Button = videojs.getComponent("Button");
+  const FitButton = videojs.extend(Button, {
+    constructor: function(){
+      Button.apply(this, arguments);
+      this.isFill = false;
+    },
+    handleClick: function(){
+      this.isFill = !this.isFill;
+      const v = document.querySelector(".vjs-tech");
+      if(v) v.style.objectFit = this.isFill ? "cover" : "contain";
+      this.controlText(this.isFill ? "Fill Screen" : "Best Fit");
+      this.el().querySelector(".vjs-icon-placeholder").innerText = this.isFill ? "▣" : "⬜";
+    },
+    createEl: function(){
+      const el = Button.prototype.createEl.call(this, "button", {
+        className: "vjs-control vjs-button vjs-fit-button",
+      });
+      const span = videojs.dom.createEl("span", {
+        className: "vjs-icon-placeholder",
+        innerHTML: "⬜"
+      });
+      span.style.cssText = "font-size:16px;line-height:3em";
+      el.appendChild(span);
+      return el;
+    }
   });
+  videojs.registerComponent("FitButton", FitButton);
+  player.controlBar.addChild("FitButton", {}, player.controlBar.children().length - 1);
 });
 
 // Double tap forward/backward 10 seconds
-let tapLeftTimer = null;
-let tapRightTimer = null;
-
-function showIndicator(el, duration){
-  el.style.display = "block";
-  setTimeout(() => { el.style.display = "none"; }, duration || 600);
-}
-
-document.getElementById("tapLeft").addEventListener("dblclick", () => {
+document.getElementById("tapLeft").addEventListener("dblclick", (e) => {
+  e.preventDefault();
   player.currentTime(Math.max(0, player.currentTime() - 10));
-  showIndicator(document.getElementById("indLeft"));
+  const ind = document.getElementById("indLeft");
+  ind.style.display = "block";
+  setTimeout(() => { ind.style.display = "none"; }, 600);
 });
 
-document.getElementById("tapRight").addEventListener("dblclick", () => {
+document.getElementById("tapRight").addEventListener("dblclick", (e) => {
+  e.preventDefault();
   player.currentTime(Math.min(player.duration(), player.currentTime() + 10));
-  showIndicator(document.getElementById("indRight"));
+  const ind = document.getElementById("indRight");
+  ind.style.display = "block";
+  setTimeout(() => { ind.style.display = "none"; }, 600);
 });
 
 // Single tap = play/pause
-document.getElementById("tapLeft").addEventListener("click", (e) => {
-  if(e.detail === 1){
-    setTimeout(() => { if(e.detail === 1) player.paused() ? player.play() : player.pause(); }, 250);
-  }
+let tapLeftCount = 0;
+let tapRightCount = 0;
+
+document.getElementById("tapLeft").addEventListener("click", () => {
+  tapLeftCount++;
+  setTimeout(() => {
+    if(tapLeftCount === 1) player.paused() ? player.play() : player.pause();
+    tapLeftCount = 0;
+  }, 250);
 });
 
-document.getElementById("tapRight").addEventListener("click", (e) => {
-  if(e.detail === 1){
-    setTimeout(() => { if(e.detail === 1) player.paused() ? player.play() : player.pause(); }, 250);
-  }
+document.getElementById("tapRight").addEventListener("click", () => {
+  tapRightCount++;
+  setTimeout(() => {
+    if(tapRightCount === 1) player.paused() ? player.play() : player.pause();
+    tapRightCount = 0;
+  }, 250);
 });
 </script>
 </body>
