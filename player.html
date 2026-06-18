@@ -9,7 +9,14 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center}
-.video-wrap{width:100%;max-width:900px}
+.video-wrap{width:100%;max-width:900px;position:relative}
+.video-wrap:-webkit-full-screen{max-width:100%}
+.video-wrap:fullscreen{max-width:100%}
+.tap-left{position:absolute;top:0;left:0;width:40%;height:100%;z-index:10;cursor:pointer}
+.tap-right{position:absolute;top:0;right:0;width:40%;height:100%;z-index:10;cursor:pointer}
+.tap-indicator{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;padding:8px 14px;border-radius:20px;font-size:14px;font-weight:bold;display:none;pointer-events:none;z-index:20}
+.tap-left-ind{left:10px}
+.tap-right-ind{right:10px}
 .info-box{width:100%;max-width:900px;padding:16px}
 .file-title{font-size:20px;font-weight:bold;line-height:1.3;margin-bottom:10px}
 .meta{display:flex;gap:10px;margin-bottom:16px;align-items:center}
@@ -22,38 +29,28 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .exp-title{font-size:24px;font-weight:bold;color:#e50914;margin-bottom:10px}
 .exp-msg{color:#aaa;margin-bottom:30px;font-size:15px}
 .exp-btn{display:block;width:100%;max-width:400px;padding:14px 24px;border-radius:8px;text-decoration:none;font-size:16px;font-weight:bold;margin-bottom:10px;text-align:center}
-.vjs-tech{object-fit:contain}
-.vjs-tech.fill{object-fit:cover}
-.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.btn-view{padding:12px 6px;border:none;color:#fff;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer;text-align:center}
-.btn-view.active{outline:2px solid #fff}
-.blue{background:#1a73e8}
-.orange{background:#e57c00}
-.btn-fs{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#1a73e8;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;border:none;cursor:pointer;margin-bottom:10px}
 </style>
 </head>
 <body>
 
 <div id="mainPlayer" style="width:100%;display:flex;flex-direction:column;align-items:center">
-  <div class="video-wrap">
+  <div class="video-wrap" id="videoWrap">
     <video-js id="player" class="vjs-default-skin vjs-big-play-centered"
       controls autoplay playsinline preload="auto"
       style="width:100%;min-height:220px">
     </video-js>
+    <div class="tap-left" id="tapLeft"></div>
+    <div class="tap-right" id="tapRight"></div>
+    <div class="tap-indicator tap-left-ind" id="indLeft">⏪ -10s</div>
+    <div class="tap-indicator tap-right-ind" id="indRight">+10s ⏩</div>
   </div>
+
   <div class="info-box">
     <div class="file-title" id="title">Loading...</div>
     <div class="meta">
       <span class="size-badge" id="sizeBadge">HD</span>
       <span class="quality">HD</span>
     </div>
-
-    <div class="btn-row">
-      <button class="btn-view blue active" id="btn-contain" onclick="setFit('contain')">⬜ Best Fit</button>
-      <button class="btn-view orange" id="btn-cover" onclick="setFit('cover')">▣ Fill Screen</button>
-    </div>
-    <button class="btn-fs" onclick="goFullscreen()">⛶ Full Screen</button>
-
     <a id="dlbtn" class="btn-dl" href="#" target="_blank">⬇ Download</a>
     <a class="btn-tg" href="https://t.me/MadForEachOtherShow" target="_blank">📢 Join Telegram Channel</a>
   </div>
@@ -88,9 +85,19 @@ if(exp){
   }
 }
 
+// Fix size format e.g. 54M → 54MB
+function formatSize(s){
+  if(!s) return "HD";
+  s = s.toString().trim();
+  if(s.match(/^\d+(\.\d+)?M$/)) return s.replace("M","MB");
+  if(s.match(/^\d+(\.\d+)?G$/)) return s.replace("G","GB");
+  if(s.match(/^\d+(\.\d+)?K$/)) return s.replace("K","KB");
+  return s;
+}
+
 document.getElementById("title").innerText = title;
 document.title = title;
-document.getElementById("sizeBadge").innerText = size;
+document.getElementById("sizeBadge").innerText = formatSize(size);
 document.getElementById("dlbtn").href = rawUrl || "#";
 
 const player = videojs("player", {
@@ -106,28 +113,60 @@ player.on("error", () => {
   player.play();
 });
 
-function setFit(mode){
-  const v = document.querySelector(".vjs-tech");
-  if(v){
-    v.style.objectFit = mode;
-    if(mode === "cover") v.classList.add("fill");
-    else v.classList.remove("fill");
-  }
-  document.getElementById("btn-contain").classList.toggle("active", mode==="contain");
-  document.getElementById("btn-cover").classList.toggle("active", mode==="cover");
+// Add custom settings button to video player controls
+player.ready(() => {
+  const controlBar = player.getChild("ControlBar");
+
+  // Full Screen already in video.js controls ✅
+
+  // Add Fit/Fill toggle button
+  const fitBtn = player.controlBar.addChild("button", {}, controlBar.children().length - 1);
+  fitBtn.addClass("vjs-fit-button");
+  fitBtn.el().innerHTML = "⬜";
+  fitBtn.el().title = "Best Fit";
+  fitBtn.el().style.cssText = "font-size:16px;cursor:pointer;padding:0 8px";
+
+  let isFill = false;
+  fitBtn.on("click", () => {
+    isFill = !isFill;
+    const v = document.querySelector(".vjs-tech");
+    if(v) v.style.objectFit = isFill ? "cover" : "contain";
+    fitBtn.el().innerHTML = isFill ? "▣" : "⬜";
+    fitBtn.el().title = isFill ? "Fill Screen" : "Best Fit";
+  });
+});
+
+// Double tap forward/backward 10 seconds
+let tapLeftTimer = null;
+let tapRightTimer = null;
+
+function showIndicator(el, duration){
+  el.style.display = "block";
+  setTimeout(() => { el.style.display = "none"; }, duration || 600);
 }
 
-function goFullscreen(){
-  const wrap = document.querySelector(".video-wrap");
-  if(document.fullscreenElement||document.webkitFullscreenElement){
-    if(document.exitFullscreen) document.exitFullscreen();
-    else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
-  } else {
-    if(wrap.requestFullscreen) wrap.requestFullscreen();
-    else if(wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
-    else if(document.querySelector("video").webkitEnterFullscreen) document.querySelector("video").webkitEnterFullscreen();
+document.getElementById("tapLeft").addEventListener("dblclick", () => {
+  player.currentTime(Math.max(0, player.currentTime() - 10));
+  showIndicator(document.getElementById("indLeft"));
+});
+
+document.getElementById("tapRight").addEventListener("dblclick", () => {
+  player.currentTime(Math.min(player.duration(), player.currentTime() + 10));
+  showIndicator(document.getElementById("indRight"));
+});
+
+// Single tap = play/pause
+document.getElementById("tapLeft").addEventListener("click", (e) => {
+  if(e.detail === 1){
+    setTimeout(() => { if(e.detail === 1) player.paused() ? player.play() : player.pause(); }, 250);
   }
-}
+});
+
+document.getElementById("tapRight").addEventListener("click", (e) => {
+  if(e.detail === 1){
+    setTimeout(() => { if(e.detail === 1) player.paused() ? player.play() : player.pause(); }, 250);
+  }
+});
 </script>
 </body>
 </html>
