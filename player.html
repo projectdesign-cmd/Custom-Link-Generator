@@ -17,9 +17,11 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .tap-left-ind{left:8px}
 .tap-right-ind{right:8px}
 
-.aspect-toggle{position:absolute;bottom:52px;right:8px;z-index:30;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;display:flex;align-items:center}
+.vjs-aspect-button{cursor:pointer}
+.vjs-aspect-button .vjs-icon-placeholder{display:none}
+.vjs-aspect-button svg{margin-top:11px}
 
-.aspect-menu{position:absolute;bottom:90px;right:8px;background:#1a1a2e;border-radius:10px;overflow:hidden;z-index:40;display:none;min-width:160px;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
+.aspect-menu{position:absolute;bottom:50px;right:8px;background:#1a1a2e;border-radius:10px;overflow:hidden;z-index:40;display:none;min-width:160px;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
 .aspect-item{padding:14px 16px;font-size:14px;color:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,0.06)}
 .aspect-item:last-child{border-bottom:none}
 .aspect-item:active{background:rgba(255,255,255,0.08)}
@@ -65,11 +67,6 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
     <div class="tap-indicator tap-left-ind" id="indLeft">-10s</div>
     <div class="tap-indicator tap-right-ind" id="indRight">+10s</div>
 
-    <button class="aspect-toggle" id="aspectToggle" onclick="toggleMenu()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="margin-right:4px">
-        <path d="M3 9V5a2 2 0 0 1 2-2h4M21 9V5a2 2 0 0 0-2-2h-4M3 15v4a2 2 0 0 0 2 2h4M21 15v4a2 2 0 0 1-2 2h-4"/>
-      </svg>Aspect Ratio
-    </button>
     <div class="aspect-menu" id="aspectMenu">
       <div class="aspect-item active" data-mode="contain" data-label="Original">Original<span class="check">✓</span></div>
       <div class="aspect-item" data-mode="1:1" data-label="1:1 Square">1:1 Square</div>
@@ -147,9 +144,35 @@ player.on("error", () => {
   player.play();
 });
 
+// Add Aspect Ratio button INSIDE the control bar, next to fullscreen
+player.ready(function(){
+  const Button = videojs.getComponent('Button');
+  const AspectButton = videojs.extend(Button, {
+    constructor: function(playerObj, options){
+      Button.apply(this, [playerObj, options]);
+      this.controlText('Aspect Ratio');
+    },
+    handleClick: function(){
+      toggleMenu();
+    },
+    createEl: function(){
+      const el = Button.prototype.createEl.call(this, 'button', {
+        className: 'vjs-control vjs-button vjs-aspect-button'
+      });
+      el.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="display:block;margin:0 auto"><path d="M3 9V5a2 2 0 0 1 2-2h4M21 9V5a2 2 0 0 0-2-2h-4M3 15v4a2 2 0 0 0 2 2h4M21 15v4a2 2 0 0 1-2 2h-4"/></svg>';
+      return el;
+    }
+  });
+  videojs.registerComponent('AspectButton', AspectButton);
+  const children = player.controlBar.children();
+  let fsIndex = children.length;
+  for(let i=0; i<children.length; i++){
+    if(children[i].name && children[i].name() === 'FullscreenToggle'){ fsIndex = i; break; }
+  }
+  player.controlBar.addChild('AspectButton', {}, fsIndex);
+});
+
 const menu = document.getElementById("aspectMenu");
-const toggleBtn = document.getElementById("aspectToggle");
-const iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="margin-right:4px"><path d="M3 9V5a2 2 0 0 1 2-2h4M21 9V5a2 2 0 0 0-2-2h-4M3 15v4a2 2 0 0 0 2 2h4M21 15v4a2 2 0 0 1-2 2h-4"/></svg>';
 
 function toggleMenu(){
   menu.style.display = menu.style.display === "block" ? "none" : "block";
@@ -166,7 +189,6 @@ document.querySelectorAll(".aspect-item").forEach(item => {
     });
     item.classList.add("active");
     item.innerHTML = label + '<span class="check">✓</span>';
-    toggleBtn.innerHTML = iconSvg + label;
     menu.style.display = "none";
   });
 });
@@ -204,7 +226,7 @@ function applyAspect(mode){
 }
 
 document.addEventListener("click", (e) => {
-  if(!menu.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)){
+  if(!menu.contains(e.target) && !e.target.closest(".vjs-aspect-button")){
     menu.style.display = "none";
   }
 });
@@ -247,6 +269,20 @@ document.getElementById("tapRight").addEventListener("touchend", (e) => {
   }
 });
 
+// Click fallback for non-touch devices
+document.getElementById("tapLeft").addEventListener("click", (e) => {
+  if(e.detail === 2){
+    player.currentTime(Math.max(0, player.currentTime() - 10));
+    showInd(document.getElementById("indLeft"));
+  }
+});
+document.getElementById("tapRight").addEventListener("click", (e) => {
+  if(e.detail === 2){
+    player.currentTime(Math.min(player.duration(), player.currentTime() + 10));
+    showInd(document.getElementById("indRight"));
+  }
+});
+
 window.addEventListener("orientationchange", () => {
   setTimeout(() => { player.dimensions(document.querySelector(".video-wrap").offsetWidth, null); }, 300);
 });
@@ -255,4 +291,4 @@ window.addEventListener("resize", () => {
 });
 </script>
 </body>
-  </html>
+</html>
