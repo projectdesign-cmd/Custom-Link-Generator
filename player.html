@@ -17,7 +17,7 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .tap-left-ind{left:8px}
 .tap-right-ind{right:8px}
 
-.aspect-toggle{position:absolute;bottom:52px;right:8px;z-index:30;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none}
+.aspect-toggle{position:absolute;bottom:52px;right:8px;z-index:30;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;display:flex;align-items:center}
 
 .aspect-menu{position:absolute;bottom:90px;right:8px;background:#1a1a2e;border-radius:10px;overflow:hidden;z-index:40;display:none;min-width:160px;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
 .aspect-item{padding:14px 16px;font-size:14px;color:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,0.06)}
@@ -65,7 +65,11 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
     <div class="tap-indicator tap-left-ind" id="indLeft">-10s</div>
     <div class="tap-indicator tap-right-ind" id="indRight">+10s</div>
 
-    <button class="aspect-toggle" id="aspectToggle" onclick="toggleMenu()">⛶ Aspect Ratio</button>
+    <button class="aspect-toggle" id="aspectToggle" onclick="toggleMenu()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="margin-right:4px">
+        <path d="M3 9V5a2 2 0 0 1 2-2h4M21 9V5a2 2 0 0 0-2-2h-4M3 15v4a2 2 0 0 0 2 2h4M21 15v4a2 2 0 0 1-2 2h-4"/>
+      </svg>Aspect Ratio
+    </button>
     <div class="aspect-menu" id="aspectMenu">
       <div class="aspect-item active" data-mode="contain" data-label="Original">Original<span class="check">✓</span></div>
       <div class="aspect-item" data-mode="1:1" data-label="1:1 Square">1:1 Square</div>
@@ -143,9 +147,9 @@ player.on("error", () => {
   player.play();
 });
 
-// Aspect ratio menu logic
 const menu = document.getElementById("aspectMenu");
 const toggleBtn = document.getElementById("aspectToggle");
+const iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="margin-right:4px"><path d="M3 9V5a2 2 0 0 1 2-2h4M21 9V5a2 2 0 0 0-2-2h-4M3 15v4a2 2 0 0 0 2 2h4M21 15v4a2 2 0 0 1-2 2h-4"/></svg>';
 
 function toggleMenu(){
   menu.style.display = menu.style.display === "block" ? "none" : "block";
@@ -162,7 +166,7 @@ document.querySelectorAll(".aspect-item").forEach(item => {
     });
     item.classList.add("active");
     item.innerHTML = label + '<span class="check">✓</span>';
-    toggleBtn.innerText = "⛶ " + label;
+    toggleBtn.innerHTML = iconSvg + label;
     menu.style.display = "none";
   });
 });
@@ -172,7 +176,6 @@ function applyAspect(mode){
   const wrap = document.getElementById("videoWrap");
   if(!v) return;
 
-  // Reset
   v.style.width = "100%";
   v.style.height = "100%";
   v.style.objectFit = "contain";
@@ -184,7 +187,7 @@ function applyAspect(mode){
   }
   wrap.style.setProperty("--fit-mode","contain");
 
-  if(mode === "contain") return; // Original
+  if(mode === "contain") return;
 
   const ratios = { "1:1":1, "4:3":4/3, "16:9":16/9, "1.85:1":1.85, "21:9":21/9 };
   const ratio = ratios[mode];
@@ -200,9 +203,8 @@ function applyAspect(mode){
   v.style.objectFit = "fill";
 }
 
-// Close menu on outside tap
 document.addEventListener("click", (e) => {
-  if(!menu.contains(e.target) && e.target !== toggleBtn){
+  if(!menu.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)){
     menu.style.display = "none";
   }
 });
@@ -253,4 +255,4 @@ window.addEventListener("resize", () => {
 });
 </script>
 </body>
-</html>
+  </html>
