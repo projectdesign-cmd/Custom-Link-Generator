@@ -16,9 +16,16 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .tap-indicator{position:absolute;top:45%;transform:translateY(-50%);background:rgba(0,0,0,0.7);color:#fff;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:bold;display:none;pointer-events:none;z-index:20}
 .tap-left-ind{left:8px}
 .tap-right-ind{right:8px}
-.screen-btns{position:absolute;bottom:52px;right:8px;display:flex;gap:6px;z-index:30}
-.screen-btn{background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none}
-.screen-btn.active{background:rgba(26,115,232,0.85)}
+
+.aspect-toggle{position:absolute;bottom:52px;right:8px;z-index:30;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none}
+
+.aspect-menu{position:absolute;bottom:90px;right:8px;background:#1a1a2e;border-radius:10px;overflow:hidden;z-index:40;display:none;min-width:160px;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
+.aspect-item{padding:14px 16px;font-size:14px;color:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,0.06)}
+.aspect-item:last-child{border-bottom:none}
+.aspect-item:active{background:rgba(255,255,255,0.08)}
+.aspect-item.active{background:rgba(229,9,20,0.25);color:#ff4d5e}
+.aspect-item .check{color:#ff4d5e;font-weight:bold}
+
 .info-box{width:100%;max-width:900px;padding:16px}
 .file-title{font-size:20px;font-weight:bold;line-height:1.3;margin-bottom:10px}
 .meta{display:flex;gap:10px;margin-bottom:16px;align-items:center}
@@ -32,7 +39,6 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .exp-msg{color:#aaa;margin-bottom:30px;font-size:15px}
 .exp-btn{display:block;width:100%;max-width:400px;padding:14px 24px;border-radius:8px;text-decoration:none;font-size:16px;font-weight:bold;margin-bottom:10px;text-align:center}
 
-/* Landscape - non fullscreen browser rotation */
 @media screen and (orientation:landscape){
   body{flex-direction:row;align-items:flex-start;flex-wrap:wrap}
   .video-wrap{max-width:65vw;flex:1}
@@ -40,13 +46,10 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
   .file-title{font-size:15px}
 }
 
-/* True Fullscreen mode - both orientations */
 .video-wrap:-webkit-full-screen{width:100vw!important;height:100vh!important;max-width:100vw!important}
 .video-wrap:fullscreen{width:100vw!important;height:100vh!important;max-width:100vw!important}
 .video-wrap:-webkit-full-screen .vjs-tech{object-fit:var(--fit-mode,contain)!important;width:100%!important;height:100%!important}
 .video-wrap:fullscreen .vjs-tech{object-fit:var(--fit-mode,contain)!important;width:100%!important;height:100%!important}
-.video-wrap:-webkit-full-screen .screen-btns{bottom:60px}
-.video-wrap:fullscreen .screen-btns{bottom:60px}
 </style>
 </head>
 <body>
@@ -61,9 +64,16 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
     <div class="tap-zone tap-right" id="tapRight"></div>
     <div class="tap-indicator tap-left-ind" id="indLeft">-10s</div>
     <div class="tap-indicator tap-right-ind" id="indRight">+10s</div>
-    <div class="screen-btns">
-      <button class="screen-btn active" id="btnFit" onclick="setFit('contain')">⬜ Fit</button>
-      <button class="screen-btn" id="btnFill" onclick="setFit('cover')">▣ Fill</button>
+
+    <button class="aspect-toggle" id="aspectToggle" onclick="toggleMenu()">⛶ Aspect Ratio</button>
+    <div class="aspect-menu" id="aspectMenu">
+      <div class="aspect-item active" data-mode="contain" data-label="Original">Original<span class="check">✓</span></div>
+      <div class="aspect-item" data-mode="1:1" data-label="1:1 Square">1:1 Square</div>
+      <div class="aspect-item" data-mode="4:3" data-label="4:3 Classic">4:3 Classic</div>
+      <div class="aspect-item" data-mode="16:9" data-label="16:9 Wide">16:9 Wide</div>
+      <div class="aspect-item" data-mode="1.85:1" data-label="1.85:1 Cinema">1.85:1 Cinema</div>
+      <div class="aspect-item" data-mode="21:9" data-label="21:9 Ultrawide">21:9 Ultrawide</div>
+      <div class="aspect-item" data-mode="cover" data-label="Fill Screen">Fill Screen</div>
     </div>
   </div>
 
@@ -133,13 +143,69 @@ player.on("error", () => {
   player.play();
 });
 
-function setFit(mode){
-  const v = document.querySelector(".vjs-tech");
-  if(v) v.style.objectFit = mode;
-  document.getElementById("videoWrap").style.setProperty("--fit-mode", mode);
-  document.getElementById("btnFit").classList.toggle("active", mode === "contain");
-  document.getElementById("btnFill").classList.toggle("active", mode === "cover");
+// Aspect ratio menu logic
+const menu = document.getElementById("aspectMenu");
+const toggleBtn = document.getElementById("aspectToggle");
+
+function toggleMenu(){
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
 }
+
+document.querySelectorAll(".aspect-item").forEach(item => {
+  item.addEventListener("click", () => {
+    const mode = item.getAttribute("data-mode");
+    const label = item.getAttribute("data-label");
+    applyAspect(mode);
+    document.querySelectorAll(".aspect-item").forEach(i => {
+      i.classList.remove("active");
+      i.innerHTML = i.getAttribute("data-label");
+    });
+    item.classList.add("active");
+    item.innerHTML = label + '<span class="check">✓</span>';
+    toggleBtn.innerText = "⛶ " + label;
+    menu.style.display = "none";
+  });
+});
+
+function applyAspect(mode){
+  const v = document.querySelector(".vjs-tech");
+  const wrap = document.getElementById("videoWrap");
+  if(!v) return;
+
+  // Reset
+  v.style.width = "100%";
+  v.style.height = "100%";
+  v.style.objectFit = "contain";
+
+  if(mode === "cover"){
+    v.style.objectFit = "cover";
+    wrap.style.setProperty("--fit-mode","cover");
+    return;
+  }
+  wrap.style.setProperty("--fit-mode","contain");
+
+  if(mode === "contain") return; // Original
+
+  const ratios = { "1:1":1, "4:3":4/3, "16:9":16/9, "1.85:1":1.85, "21:9":21/9 };
+  const ratio = ratios[mode];
+  if(!ratio) return;
+
+  const containerW = wrap.offsetWidth;
+  const containerH = wrap.offsetHeight;
+  let w = containerW, h = containerW / ratio;
+  if(h > containerH){ h = containerH; w = containerH * ratio; }
+
+  v.style.width = w + "px";
+  v.style.height = h + "px";
+  v.style.objectFit = "fill";
+}
+
+// Close menu on outside tap
+document.addEventListener("click", (e) => {
+  if(!menu.contains(e.target) && e.target !== toggleBtn){
+    menu.style.display = "none";
+  }
+});
 
 function showInd(el){
   el.style.display = "block";
@@ -179,13 +245,9 @@ document.getElementById("tapRight").addEventListener("touchend", (e) => {
   }
 });
 
-// Force re-layout on rotation
 window.addEventListener("orientationchange", () => {
-  setTimeout(() => {
-    player.dimensions(document.querySelector(".video-wrap").offsetWidth, null);
-  }, 300);
+  setTimeout(() => { player.dimensions(document.querySelector(".video-wrap").offsetWidth, null); }, 300);
 });
-
 window.addEventListener("resize", () => {
   player.dimensions(document.querySelector(".video-wrap").offsetWidth, null);
 });
