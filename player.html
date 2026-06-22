@@ -1,180 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Player</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #111; color: #fff; font-family: Arial, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 16px; }
+  .container { width: 100%; max-width: 860px; }
+  h1 { font-size: 15px; padding: 10px 0; color: #eee; word-break: break-all; line-height: 1.5; }
+  video { width: 100%; background: #000; border-radius: 8px; margin-bottom: 12px; }
+  .meta { background: #1e1e1e; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; font-size: 13px; color: #aaa; }
+  .meta .row { margin-bottom: 10px; }
+  .meta label { display:block; margin-bottom:4px; color:#888; font-size:12px; }
+  .meta input { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 8px 10px; border-radius: 6px; font-size: 13px; }
+  .meta input:focus { outline: none; border-color: #2563eb; }
+  .info-row { display:flex; gap:16px; color:#aaa; font-size:12px; margin-top: 6px; flex-wrap:wrap; }
+  .btn-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .btn { display: inline-block; padding: 10px 20px; background: #2563eb; color: #fff; border-radius: 6px; text-decoration: none; font-size: 14px; cursor: pointer; border: none; }
+  .btn:hover { background: #1d4ed8; }
+  .btn.green { background: #16a34a; }
+  .btn.green:hover { background: #15803d; }
+  .btn:disabled { background: #555; cursor: not-allowed; }
+  .error { color: #ff4444; padding: 16px; text-align: left; background:#2a1414; border-radius:8px; margin-bottom:12px; font-size:13px; line-height:1.6; }
+  .warn { color: #ffb020; padding: 12px 16px; text-align: left; background:#2a230f; border-radius:8px; margin-bottom:12px; font-size:13px; line-height:1.6; }
+  .progress { font-size: 12px; color: #888; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1 id="title">Loading...</h1>
+  <div id="unsupportedBox" class="warn" style="display:none;"></div>
+  <video id="player" controls autoplay playsinline></video>
+  <div class="meta">
+    <div class="row">
+      <label>File Name (used for download)</label>
+      <input type="text" id="fileNameInput" />
+    </div>
+    <div class="row">
+      <label>Title Tag</label>
+      <input type="text" id="titleTagInput" />
+    </div>
+    <div class="info-row">
+      <span>Duration: <b id="metaDuration" style="color:#fff;">-</b></span>
+      <span>Resolution: <b id="metaRes" style="color:#fff;">-</b></span>
+      <span id="sizeRow" style="display:none;">Size: <b id="metaSize" style="color:#fff;">-</b></span>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn green" id="downloadBtn">Download</button>
+    <button class="btn" id="copyBtn">Copy Direct Link</button>
+  </div>
+  <div class="progress" id="progress"></div>
+  <p class="error" id="error" style="display:none;"></p>
+</div>
+
 <script>
-const params = new URLSearchParams(window.location.search);
-const rawUrl = params.get("url");
-const title = params.get("title") || "Video";
-const size = params.get("size") || "HD";
-const exp = params.get("exp");
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var url = params.get('url');
+  var titleParam = params.get('title');
+  var sizeParam = params.get('size');
+  var player = document.getElementById('player');
+  var titleEl = document.getElementById('title');
+  var errorEl = document.getElementById('error');
+  var unsupportedBox = document.getElementById('unsupportedBox');
+  var fileNameInput = document.getElementById('fileNameInput');
+  var titleTagInput = document.getElementById('titleTagInput');
+  var downloadBtn = document.getElementById('downloadBtn');
+  var copyBtn = document.getElementById('copyBtn');
+  var progressEl = document.getElementById('progress');
 
-document.getElementById("exp-dl").href = rawUrl || "#";
-
-if(exp){
-  const now = Math.floor(Date.now()/1000);
-  if(now > parseInt(exp)){
-    document.getElementById("mainPlayer").style.display = "none";
-    document.getElementById("expiredPage").style.display = "block";
-    throw new Error("expired");
+  function getFileName(u) {
+    try {
+      var decoded = decodeURIComponent(u);
+      var parts = decoded.split('/');
+      var last = parts[parts.length - 1].split('?')[0];
+      return last || 'video.mp4';
+    } catch (e) {
+      return 'video.mp4';
+    }
   }
-}
 
-function formatSize(s){
-  if(!s) return "HD";
-  s = s.toString().trim();
-  if(s.match(/^\d+(\.\d+)?M$/)) return s.replace("M","MB");
-  if(s.match(/^\d+(\.\d+)?G$/)) return s.replace("G","GB");
-  if(s.match(/^\d+(\.\d+)?K$/)) return s.replace("K","KB");
-  return s;
-}
+  function getExt(name) {
+    var idx = name.lastIndexOf('.');
+    if (idx === -1) return '';
+    return name.substring(idx + 1).toLowerCase();
+  }
 
-document.getElementById("title").innerText = title;
-document.title = title;
-document.getElementById("sizeBadge").innerText = formatSize(size);
-document.getElementById("dlbtn").href = rawUrl || "#";
+  function stripExt(name) {
+    var idx = name.lastIndexOf('.');
+    if (idx === -1) return name;
+    return name.substring(0, idx);
+  }
 
-const player = videojs("player", {
-  sources: [{ src: rawUrl, type: "video/mp4" }],
-  controls: true,
-  autoplay: true,
-  preload: "auto",
-  fluid: true,
-});
+  var PLAYABLE_EXT = ['mp4', 'webm', 'ogg', 'ogv', 'mov', 'm4v'];
+  var decodedUrl = '';
 
-player.on("error", () => {
-  player.src({ src: "/api/proxy?url=" + encodeURIComponent(rawUrl), type: "video/mp4" });
-  player.play();
-});
+  if (url) {
+    decodedUrl = decodeURIComponent(url);
+    var fileName = getFileName(url);
+    var ext = getExt(fileName);
+    var displayTitle = titleParam ? decodeURIComponent(titleParam) : fileName;
 
-// Inject Aspect Ratio button directly into DOM after player is ready
-player.on("loadedmetadata", insertAspectButton);
-player.ready(() => {
-  setTimeout(insertAspectButton, 500);
-});
+    titleEl.textContent = displayTitle;
+    document.title = displayTitle;
+    fileNameInput.value = fileName;
+    titleTagInput.value = stripExt(displayTitle);
 
-let aspectInserted = false;
-function insertAspectButton(){
-  if(aspectInserted) return;
-  const fsBtn = document.querySelector(".vjs-fullscreen-control");
-  const controlBar = document.querySelector(".vjs-control-bar");
-  if(!controlBar) return;
+    if (sizeParam) {
+      document.getElementById('sizeRow').style.display = 'inline';
+      document.getElementById('metaSize').textContent = decodeURIComponent(sizeParam);
+    }
 
-  const btn = document.createElement("button");
-  btn.className = "vjs-control vjs-button vjs-aspect-button";
-  btn.title = "Aspect Ratio";
-  btn.innerHTML = '<span class="vjs-icon-placeholder"></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="display:block;margin:11px auto 0"><path d="M3 9V5a2 2 0 0 1 2-2h4M21 9V5a2 2 0 0 0-2-2h-4M3 15v4a2 2 0 0 0 2 2h4M21 15v4a2 2 0 0 1-2 2h-4"/></svg>';
-  btn.onclick = toggleMenu;
-
-  if(fsBtn){
-    controlBar.insertBefore(btn, fsBtn);
+    if (PLAYABLE_EXT.indexOf(ext) === -1) {
+      player.style.display = 'none';
+      unsupportedBox.style.display = 'block';
+      unsupportedBox.textContent = 'This is a .' + ext.toUpperCase() + ' file. Most browsers cannot stream/play .' + ext + ' files directly in-page. Use the Download button below to save it and play it in a video app (VLC, MX Player, etc).';
+    } else {
+      player.src = decodedUrl;
+      player.onloadedmetadata = function() {
+        var d = Math.floor(player.duration);
+        var h = Math.floor(d / 3600);
+        var m = Math.floor((d % 3600) / 60);
+        var s = d % 60;
+        document.getElementById('metaDuration').textContent = (h > 0 ? h + 'h ' : '') + m + 'm ' + s + 's';
+        document.getElementById('metaRes').textContent = player.videoWidth + ' x ' + player.videoHeight;
+      };
+      player.onerror = function() {
+        player.style.display = 'none';
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'This video could not be played in-browser. The link may be broken/expired, or the codec inside this file is unsupported. Try the Download button instead.';
+      };
+    }
   } else {
-    controlBar.appendChild(btn);
+    errorEl.style.display = 'block';
+    errorEl.textContent = 'No video URL provided!';
   }
-  aspectInserted = true;
-}
 
-const menu = document.getElementById("aspectMenu");
+  downloadBtn.onclick = function() {
+    if (!decodedUrl) return;
+    var customName = fileNameInput.value.trim() || 'video.mp4';
+    var a = document.createElement('a');
+    a.href = decodedUrl;
+    a.download = customName;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    progressEl.textContent = "If download doesn't start automatically, long-press the video link or open it directly in your browser.";
+  };
 
-function toggleMenu(){
-  menu.style.display = menu.style.display === "block" ? "none" : "block";
-}
-
-document.querySelectorAll(".aspect-item").forEach(item => {
-  item.addEventListener("click", () => {
-    const mode = item.getAttribute("data-mode");
-    const label = item.getAttribute("data-label");
-    applyAspect(mode);
-    document.querySelectorAll(".aspect-item").forEach(i => {
-      i.classList.remove("active");
-      i.innerHTML = i.getAttribute("data-label");
+  copyBtn.onclick = function() {
+    navigator.clipboard.writeText(decodedUrl).then(function() {
+      copyBtn.textContent = 'Copied!';
+      setTimeout(function() { copyBtn.textContent = 'Copy Direct Link'; }, 1500);
     });
-    item.classList.add("active");
-    item.innerHTML = label + '<span class="check">✓</span>';
-    menu.style.display = "none";
-  });
-});
-
-function applyAspect(mode){
-  const v = document.querySelector(".vjs-tech");
-  const wrap = document.getElementById("videoWrap");
-  if(!v) return;
-
-  v.style.width = "100%";
-  v.style.height = "100%";
-  v.style.objectFit = "contain";
-
-  if(mode === "cover"){
-    v.style.objectFit = "cover";
-    wrap.style.setProperty("--fit-mode","cover");
-    return;
-  }
-  wrap.style.setProperty("--fit-mode","contain");
-
-  if(mode === "contain") return;
-
-  const ratios = { "1:1":1, "4:3":4/3, "16:9":16/9, "1.85:1":1.85, "21:9":21/9 };
-  const ratio = ratios[mode];
-  if(!ratio) return;
-
-  const containerW = wrap.offsetWidth;
-  const containerH = wrap.offsetHeight;
-  let w = containerW, h = containerW / ratio;
-  if(h > containerH){ h = containerH; w = containerH * ratio; }
-
-  v.style.width = w + "px";
-  v.style.height = h + "px";
-  v.style.objectFit = "fill";
-}
-
-document.addEventListener("click", (e) => {
-  if(!menu.contains(e.target) && !e.target.closest(".vjs-aspect-button")){
-    menu.style.display = "none";
-  }
-});
-
-function showInd(el){
-  el.style.display = "block";
-  setTimeout(() => { el.style.display = "none"; }, 700);
-}
-
-let tapLCount = 0;
-let tapRCount = 0;
-
-["touchend","click"].forEach(evt => {
-  document.getElementById("tapLeft").addEventListener(evt, (e) => {
-    if(evt === "touchend") e.preventDefault();
-    tapLCount++;
-    setTimeout(() => {
-      if(tapLCount >= 2){
-        player.currentTime(Math.max(0, player.currentTime() - 10));
-        showInd(document.getElementById("indLeft"));
-      } else if(tapLCount === 1){
-        player.paused() ? player.play() : player.pause();
-      }
-      tapLCount = 0;
-    }, 280);
-  });
-
-  document.getElementById("tapRight").addEventListener(evt, (e) => {
-    if(evt === "touchend") e.preventDefault();
-    tapRCount++;
-    setTimeout(() => {
-      if(tapRCount >= 2){
-        player.currentTime(Math.min(player.duration(), player.currentTime() + 10));
-        showInd(document.getElementById("indRight"));
-      } else if(tapRCount === 1){
-        player.paused() ? player.play() : player.pause();
-      }
-      tapRCount = 0;
-    }, 280);
-  });
-});
-
-window.addEventListener("orientationchange", () => {
-  setTimeout(() => {
-    player.dimensions(document.querySelector(".video-wrap").offsetWidth, null);
-    aspectInserted = false;
-    insertAspectButton();
-  }, 300);
-});
-window.addEventListener("resize", () => {
-  player.dimensions(document.querySelector(".video-wrap").offsetWidth, null);
-});
-                        </script>
+  };
+})();
+</script>
+</body>
+</html>
