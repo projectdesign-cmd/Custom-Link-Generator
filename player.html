@@ -36,6 +36,7 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .exp-title{font-size:24px;font-weight:bold;color:#e50914;margin-bottom:10px}
 .exp-msg{color:#aaa;margin-bottom:30px;font-size:15px}
 .exp-btn{display:block;width:100%;max-width:400px;padding:14px 24px;border-radius:8px;text-decoration:none;font-size:16px;font-weight:bold;margin-bottom:10px;text-align:center}
+.vjs-tech{object-fit:contain}
 @media screen and (orientation:landscape){
   body{flex-direction:row;align-items:flex-start;flex-wrap:wrap}
   .video-wrap{max-width:65vw;flex:1}
@@ -44,8 +45,6 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 }
 .video-wrap:-webkit-full-screen{width:100vw!important;height:100vh!important;max-width:100vw!important}
 .video-wrap:fullscreen{width:100vw!important;height:100vh!important;max-width:100vw!important}
-.video-wrap:-webkit-full-screen .vjs-tech{object-fit:var(--fit-mode,contain)!important;width:100%!important;height:100%!important}
-.video-wrap:fullscreen .vjs-tech{object-fit:var(--fit-mode,contain)!important;width:100%!important;height:100%!important}
 </style>
 </head>
 <body>
@@ -61,12 +60,7 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
     <div class="tap-indicator tap-left-ind" id="indLeft">-10s</div>
     <div class="tap-indicator tap-right-ind" id="indRight">+10s</div>
     <div class="aspect-menu" id="aspectMenu">
-      <div class="aspect-item active" data-mode="contain" data-label="Original">Original<span class="check">✓</span></div>
-      <div class="aspect-item" data-mode="1:1" data-label="1:1 Square">1:1 Square</div>
-      <div class="aspect-item" data-mode="4:3" data-label="4:3 Classic">4:3 Classic</div>
-      <div class="aspect-item" data-mode="16:9" data-label="16:9 Wide">16:9 Wide</div>
-      <div class="aspect-item" data-mode="1.85:1" data-label="1.85:1 Cinema">1.85:1 Cinema</div>
-      <div class="aspect-item" data-mode="21:9" data-label="21:9 Ultrawide">21:9 Ultrawide</div>
+      <div class="aspect-item active" data-mode="contain" data-label="Best Fit">Best Fit<span class="check">✓</span></div>
       <div class="aspect-item" data-mode="cover" data-label="Fill Screen">Fill Screen</div>
     </div>
   </div>
@@ -93,29 +87,24 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 </div>
 
 <script>
-try {
-
 const params = new URLSearchParams(window.location.search);
 const rawUrl = params.get("url");
 const title = params.get("title") || "Video";
 const size = params.get("size") || "HD";
 const exp = params.get("exp");
 
-document.getElementById("exp-dl").href = rawUrl || "#";
+if(document.getElementById("exp-dl")) document.getElementById("exp-dl").href = rawUrl || "#";
 
 let expired = false;
 if(exp){
   const now = Math.floor(Date.now()/1000);
-  if(now > parseInt(exp)){
-    expired = true;
-  }
+  if(now > parseInt(exp)) expired = true;
 }
 
 if(expired){
   document.getElementById("mainPlayer").style.display = "none";
   document.getElementById("expiredPage").style.display = "block";
 } else {
-
   function formatSize(s){
     if(!s) return "HD";
     s = s.toString().trim();
@@ -130,165 +119,111 @@ if(expired){
   document.getElementById("sizeBadge").innerText = formatSize(size);
   document.getElementById("dlbtn").href = rawUrl || "#";
 
-  const player = videojs("player", {
-    sources: [{ src: rawUrl, type: "video/mp4" }],
-    controls: true,
-    autoplay: true,
-    preload: "auto",
-    fluid: true,
-  });
-
-  player.on("error", () => {
-    player.src({ src: "/api/proxy?url=" + encodeURIComponent(rawUrl), type: "video/mp4" });
-    player.play();
-  });
-
-  player.ready(function(){
-    try {
-      const Button = videojs.getComponent('Button');
-      const AspectButton = videojs.extend(Button, {
-        constructor: function(playerObj, options){
-          Button.apply(this, [playerObj, options]);
-          this.controlText('Aspect Ratio');
-        },
-        handleClick: function(){
-          toggleMenu();
-        },
-        createEl: function(){
-          const el = Button.prototype.createEl.call(this, 'button', {
-            className: 'vjs-control vjs-button vjs-aspect-button'
-          });
-          el.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="display:block;margin:11px auto 0"><path d="M3 9V5a2 2 0 0 1 2-2h4M21 9V5a2 2 0 0 0-2-2h-4M3 15v4a2 2 0 0 0 2 2h4M21 15v4a2 2 0 0 1-2 2h-4"/></svg>';
-          return el;
-        }
-      });
-      videojs.registerComponent('AspectButton', AspectButton);
-      const children = player.controlBar.children();
-      let fsIndex = children.length;
-      for(let i=0; i<children.length; i++){
-        if(children[i].name && children[i].name() === 'FullscreenToggle'){ fsIndex = i; break; }
-      }
-      player.controlBar.addChild('AspectButton', {}, fsIndex);
-    } catch(err) {
-      console.error("Aspect button setup failed:", err);
-    }
-  });
-
-  const menu = document.getElementById("aspectMenu");
-
-  function toggleMenu(){
-    menu.style.display = menu.style.display === "block" ? "none" : "block";
-  }
-
-  document.querySelectorAll(".aspect-item").forEach(item => {
-    item.addEventListener("click", () => {
-      const mode = item.getAttribute("data-mode");
-      const label = item.getAttribute("data-label");
-      applyAspect(mode);
-      document.querySelectorAll(".aspect-item").forEach(i => {
-        i.classList.remove("active");
-        i.innerHTML = i.getAttribute("data-label");
-      });
-      item.classList.add("active");
-      item.innerHTML = label + '<span class="check">✓</span>';
-      menu.style.display = "none";
+  if(rawUrl){
+    const player = videojs("player", {
+      controls: true,
+      autoplay: true,
+      preload: "auto",
+      fluid: true,
+      sources: [{ src: rawUrl, type: "video/mp4" }]
     });
-  });
 
-  function applyAspect(mode){
-    const v = document.querySelector(".vjs-tech");
-    const wrap = document.getElementById("videoWrap");
-    if(!v) return;
-    v.style.width = "100%";
-    v.style.height = "100%";
-    v.style.objectFit = "contain";
-    if(mode === "cover"){
-      v.style.objectFit = "cover";
-      wrap.style.setProperty("--fit-mode","cover");
-      return;
+    let usedProxy = false;
+    player.on("error", function(){
+      if(!usedProxy){
+        usedProxy = true;
+        player.src({ src: "/api/proxy?url=" + encodeURIComponent(rawUrl), type: "video/mp4" });
+        player.load();
+        player.play();
+      }
+    });
+
+    player.ready(function(){
+      try {
+        const Button = videojs.getComponent('Button');
+        const AspectButton = videojs.extend(Button, {
+          constructor: function(playerObj, options){
+            Button.apply(this, [playerObj, options]);
+          },
+          handleClick: function(){
+            const menu = document.getElementById("aspectMenu");
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+          },
+          createEl: function(){
+            const el = Button.prototype.createEl.call(this, 'button', {
+              className: 'vjs-control vjs-button vjs-aspect-button'
+            });
+            el.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="display:block;margin:11px auto 0"><path d="M3 9V5a2 2 0 0 1 2-2h4M21 9V5a2 2 0 0 0-2-2h-4M3 15v4a2 2 0 0 0 2 2h4M21 15v4a2 2 0 0 1-2 2h-4"/></svg>';
+            return el;
+          }
+        });
+        videojs.registerComponent('AspectButton', AspectButton);
+        player.controlBar.addChild('AspectButton', {});
+      } catch(e){ console.error("aspect btn fail", e); }
+    });
+
+    document.querySelectorAll(".aspect-item").forEach(item => {
+      item.addEventListener("click", () => {
+        const mode = item.getAttribute("data-mode");
+        const label = item.getAttribute("data-label");
+        const v = document.querySelector(".vjs-tech");
+        if(v) v.style.objectFit = mode;
+        document.querySelectorAll(".aspect-item").forEach(i => {
+          i.classList.remove("active");
+          i.innerHTML = i.getAttribute("data-label");
+        });
+        item.classList.add("active");
+        item.innerHTML = label + '<span class="check">✓</span>';
+        document.getElementById("aspectMenu").style.display = "none";
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      const menu = document.getElementById("aspectMenu");
+      if(!menu.contains(e.target) && !e.target.closest(".vjs-aspect-button")){
+        menu.style.display = "none";
+      }
+    });
+
+    function showInd(el){
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 700);
     }
-    wrap.style.setProperty("--fit-mode","contain");
-    if(mode === "contain") return;
-    const ratios = { "1:1":1, "4:3":4/3, "16:9":16/9, "1.85:1":1.85, "21:9":21/9 };
-    const ratio = ratios[mode];
-    if(!ratio) return;
-    const containerW = wrap.offsetWidth;
-    const containerH = wrap.offsetHeight;
-    let w = containerW, h = containerW / ratio;
-    if(h > containerH){ h = containerH; w = containerH * ratio; }
-    v.style.width = w + "px";
-    v.style.height = h + "px";
-    v.style.objectFit = "fill";
-  }
 
-  document.addEventListener("click", (e) => {
-    if(!menu.contains(e.target) && !e.target.closest(".vjs-aspect-button")){
-      menu.style.display = "none";
-    }
-  });
+    let tapLCount = 0, tapRCount = 0;
 
-  function showInd(el){
-    el.style.display = "block";
-    setTimeout(() => { el.style.display = "none"; }, 700);
-  }
-
-  let tapLCount = 0;
-  let tapRCount = 0;
-
-  document.getElementById("tapLeft").addEventListener("touchend", (e) => {
-    e.preventDefault();
-    tapLCount++;
-    if(tapLCount === 2){
-      player.currentTime(Math.max(0, player.currentTime() - 10));
-      showInd(document.getElementById("indLeft"));
-      tapLCount = 0;
-    } else {
+    document.getElementById("tapLeft").addEventListener("click", () => {
+      tapLCount++;
       setTimeout(() => {
-        if(tapLCount === 1){ player.paused() ? player.play() : player.pause(); }
+        if(tapLCount >= 2){
+          player.currentTime(Math.max(0, player.currentTime() - 10));
+          showInd(document.getElementById("indLeft"));
+        } else if(tapLCount === 1){
+          player.paused() ? player.play() : player.pause();
+        }
         tapLCount = 0;
-      }, 250);
-    }
-  });
+      }, 280);
+    });
 
-  document.getElementById("tapRight").addEventListener("touchend", (e) => {
-    e.preventDefault();
-    tapRCount++;
-    if(tapRCount === 2){
-      player.currentTime(Math.min(player.duration(), player.currentTime() + 10));
-      showInd(document.getElementById("indRight"));
-      tapRCount = 0;
-    } else {
+    document.getElementById("tapRight").addEventListener("click", () => {
+      tapRCount++;
       setTimeout(() => {
-        if(tapRCount === 1){ player.paused() ? player.play() : player.pause(); }
+        if(tapRCount >= 2){
+          player.currentTime(Math.min(player.duration() || 1e9, player.currentTime() + 10));
+          showInd(document.getElementById("indRight"));
+        } else if(tapRCount === 1){
+          player.paused() ? player.play() : player.pause();
+        }
         tapRCount = 0;
-      }, 250);
-    }
-  });
+      }, 280);
+    });
 
-  document.getElementById("tapLeft").addEventListener("click", (e) => {
-    if(e.detail === 2){
-      player.currentTime(Math.max(0, player.currentTime() - 10));
-      showInd(document.getElementById("indLeft"));
-    }
-  });
-  document.getElementById("tapRight").addEventListener("click", (e) => {
-    if(e.detail === 2){
-      player.currentTime(Math.min(player.duration(), player.currentTime() + 10));
-      showInd(document.getElementById("indRight"));
-    }
-  });
-
-  window.addEventListener("orientationchange", () => {
-    setTimeout(() => { player.dimensions(document.querySelector(".video-wrap").offsetWidth, null); }, 300);
-  });
-  window.addEventListener("resize", () => {
-    player.dimensions(document.querySelector(".video-wrap").offsetWidth, null);
-  });
-}
-
-} catch(mainErr) {
-  console.error("Player init error:", mainErr);
-  document.body.innerHTML = '<div style="padding:30px;text-align:center;color:#fff"><h2>Something went wrong</h2><p style="color:#aaa;margin-top:10px">' + mainErr.message + '</p></div>';
+    window.addEventListener("orientationchange", () => {
+      setTimeout(() => { player.dimensions(document.querySelector(".video-wrap").offsetWidth, null); }, 300);
+    });
+  } else {
+    document.getElementById("title").innerText = "No video URL provided!";
+  }
 }
 </script>
 </body>
