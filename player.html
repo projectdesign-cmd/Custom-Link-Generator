@@ -2,28 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Video Player</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video-js.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center}
-.video-wrap{width:100%;max-width:900px;position:relative;background:#000}
-.tap-zone{position:absolute;top:0;width:40%;height:calc(100% - 44px);z-index:10;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;background:transparent}
-.tap-left{left:0}
-.tap-right{right:0}
-.tap-indicator{position:absolute;top:45%;transform:translateY(-50%);background:rgba(0,0,0,0.7);color:#fff;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:bold;display:none;pointer-events:none;z-index:20}
-.tap-left-ind{left:8px}
-.tap-right-ind{right:8px}
-.vjs-aspect-button{cursor:pointer}
-.vjs-aspect-button .vjs-icon-placeholder{display:none}
-.aspect-menu{position:absolute;bottom:50px;right:8px;background:#1a1a2e;border-radius:10px;overflow:hidden;z-index:40;display:none;min-width:160px;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
-.aspect-item{padding:14px 16px;font-size:14px;color:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,0.06)}
-.aspect-item:last-child{border-bottom:none}
-.aspect-item:active{background:rgba(255,255,255,0.08)}
-.aspect-item.active{background:rgba(229,9,20,0.25);color:#ff4d5e}
-.aspect-item .check{color:#ff4d5e;font-weight:bold}
+.video-wrap{width:100%;max-width:900px}
 .info-box{width:100%;max-width:900px;padding:16px}
 .file-title{font-size:20px;font-weight:bold;line-height:1.3;margin-bottom:10px}
 .meta{display:flex;gap:10px;margin-bottom:16px;align-items:center}
@@ -31,59 +17,25 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .quality{color:#aaa;font-size:14px}
 .btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;color:#000;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
 .btn-tg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#229ED9;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
-.expired-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;text-align:center;width:100%}
-.exp-icon{font-size:70px;margin-bottom:20px}
-.exp-title{font-size:24px;font-weight:bold;color:#e50914;margin-bottom:10px}
-.exp-msg{color:#aaa;margin-bottom:30px;font-size:15px}
-.exp-btn{display:block;width:100%;max-width:400px;padding:14px 24px;border-radius:8px;text-decoration:none;font-size:16px;font-weight:bold;margin-bottom:10px;text-align:center}
-.vjs-tech{object-fit:contain}
-@media screen and (orientation:landscape){
-  body{flex-direction:row;align-items:flex-start;flex-wrap:wrap}
-  .video-wrap{max-width:65vw;flex:1}
-  .info-box{max-width:35vw;max-height:100vh;overflow-y:auto;padding:12px}
-  .file-title{font-size:15px}
-}
-.video-wrap:-webkit-full-screen{width:100vw!important;height:100vh!important;max-width:100vw!important}
-.video-wrap:fullscreen{width:100vw!important;height:100vh!important;max-width:100vw!important}
+.vjs-tech{transition:object-fit 0.2s}
 </style>
 </head>
 <body>
-
-<div id="mainPlayer" style="width:100%;display:flex;flex-direction:column;align-items:center">
-  <div class="video-wrap" id="videoWrap">
-    <video-js id="player" class="vjs-default-skin vjs-big-play-centered"
-      controls autoplay playsinline preload="auto"
-      style="width:100%;min-height:220px">
-    </video-js>
-    <div class="tap-zone tap-left" id="tapLeft"></div>
-    <div class="tap-zone tap-right" id="tapRight"></div>
-    <div class="tap-indicator tap-left-ind" id="indLeft">-10s</div>
-    <div class="tap-indicator tap-right-ind" id="indRight">+10s</div>
-    <div class="aspect-menu" id="aspectMenu">
-      <div class="aspect-item active" data-mode="contain" data-label="Best Fit">Best Fit<span class="check">✓</span></div>
-      <div class="aspect-item" data-mode="cover" data-label="Fill Screen">Fill Screen</div>
-    </div>
-  </div>
-
-  <div class="info-box">
-    <div class="file-title" id="title">Loading...</div>
-    <div class="meta">
-      <span class="size-badge" id="sizeBadge">HD</span>
-      <span class="quality">HD</span>
-    </div>
-    <a id="dlbtn" class="btn-dl" href="#" target="_blank">⬇ Download</a>
-    <a class="btn-tg" href="https://t.me/MadForEachOtherShow" target="_blank">📢 Join Telegram Channel</a>
-  </div>
+<div class="video-wrap">
+  <video-js id="player" class="vjs-default-skin vjs-big-play-centered"
+    controls autoplay playsinline preload="auto"
+    style="width:100%;min-height:220px">
+  </video-js>
 </div>
 
-<div id="expiredPage" style="display:none;width:100%">
-  <div class="expired-wrap">
-    <div class="exp-icon">⏰</div>
-    <div class="exp-title">Video Player Expired!</div>
-    <div class="exp-msg">This video player has expired.<br>You can still download the video below!</div>
-    <a id="exp-dl" class="exp-btn" href="#" target="_blank" style="background:#fff;color:#000">⬇ Download Video</a>
-    <a class="exp-btn" href="https://t.me/MadForEachOtherShow" target="_blank" style="background:#229ED9;color:#fff">📢 Join Telegram Channel</a>
+<div class="info-box">
+  <div class="file-title" id="title">Loading...</div>
+  <div class="meta">
+    <span class="size-badge" id="sizeBadge">HD</span>
+    <span class="quality">HD</span>
   </div>
+  <a id="dlbtn" class="btn-dl" href="#" target="_blank">⬇ Download</a>
+  <a class="btn-tg" href="https://t.me/MadForEachOtherShow" target="_blank">📢 Join Telegram Channel</a>
 </div>
 
 <script>
@@ -91,140 +43,24 @@ const params = new URLSearchParams(window.location.search);
 const rawUrl = params.get("url");
 const title = params.get("title") || "Video";
 const size = params.get("size") || "HD";
-const exp = params.get("exp");
 
-if(document.getElementById("exp-dl")) document.getElementById("exp-dl").href = rawUrl || "#";
+document.getElementById("title").innerText = title;
+document.title = title;
+document.getElementById("sizeBadge").innerText = size;
+document.getElementById("dlbtn").href = rawUrl || "#";
 
-let expired = false;
-if(exp){
-  const now = Math.floor(Date.now()/1000);
-  if(now > parseInt(exp)) expired = true;
-}
+const player = videojs("player", {
+  sources: [{ src: rawUrl, type: "video/mp4" }],
+  controls: true,
+  autoplay: true,
+  preload: "auto",
+  fluid: true,
+});
 
-if(expired){
-  document.getElementById("mainPlayer").style.display = "none";
-  document.getElementById("expiredPage").style.display = "block";
-} else {
-  function formatSize(s){
-    if(!s) return "HD";
-    s = s.toString().trim();
-    if(s.match(/^\d+(\.\d+)?M$/)) return s.replace("M","MB");
-    if(s.match(/^\d+(\.\d+)?G$/)) return s.replace("G","GB");
-    if(s.match(/^\d+(\.\d+)?K$/)) return s.replace("K","KB");
-    return s;
-  }
-
-  document.getElementById("title").innerText = title;
-  document.title = title;
-  document.getElementById("sizeBadge").innerText = formatSize(size);
-  document.getElementById("dlbtn").href = rawUrl || "#";
-
-  if(rawUrl){
-    const player = videojs("player", {
-      controls: true,
-      autoplay: true,
-      preload: "auto",
-      fluid: true,
-      sources: [{ src: rawUrl, type: "video/mp4" }]
-    });
-
-    let usedProxy = false;
-    player.on("error", function(){
-      if(!usedProxy){
-        usedProxy = true;
-        player.src({ src: "/api/proxy?url=" + encodeURIComponent(rawUrl), type: "video/mp4" });
-        player.load();
-        player.play();
-      }
-    });
-
-    player.ready(function(){
-      try {
-        const Button = videojs.getComponent('Button');
-        const AspectButton = videojs.extend(Button, {
-          constructor: function(playerObj, options){
-            Button.apply(this, [playerObj, options]);
-          },
-          handleClick: function(){
-            const menu = document.getElementById("aspectMenu");
-            menu.style.display = menu.style.display === "block" ? "none" : "block";
-          },
-          createEl: function(){
-            const el = Button.prototype.createEl.call(this, 'button', {
-              className: 'vjs-control vjs-button vjs-aspect-button'
-            });
-            el.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="display:block;margin:11px auto 0"><path d="M3 9V5a2 2 0 0 1 2-2h4M21 9V5a2 2 0 0 0-2-2h-4M3 15v4a2 2 0 0 0 2 2h4M21 15v4a2 2 0 0 1-2 2h-4"/></svg>';
-            return el;
-          }
-        });
-        videojs.registerComponent('AspectButton', AspectButton);
-        player.controlBar.addChild('AspectButton', {});
-      } catch(e){ console.error("aspect btn fail", e); }
-    });
-
-    document.querySelectorAll(".aspect-item").forEach(item => {
-      item.addEventListener("click", () => {
-        const mode = item.getAttribute("data-mode");
-        const label = item.getAttribute("data-label");
-        const v = document.querySelector(".vjs-tech");
-        if(v) v.style.objectFit = mode;
-        document.querySelectorAll(".aspect-item").forEach(i => {
-          i.classList.remove("active");
-          i.innerHTML = i.getAttribute("data-label");
-        });
-        item.classList.add("active");
-        item.innerHTML = label + '<span class="check">✓</span>';
-        document.getElementById("aspectMenu").style.display = "none";
-      });
-    });
-
-    document.addEventListener("click", (e) => {
-      const menu = document.getElementById("aspectMenu");
-      if(!menu.contains(e.target) && !e.target.closest(".vjs-aspect-button")){
-        menu.style.display = "none";
-      }
-    });
-
-    function showInd(el){
-      el.style.display = "block";
-      setTimeout(() => { el.style.display = "none"; }, 700);
-    }
-
-    let tapLCount = 0, tapRCount = 0;
-
-    document.getElementById("tapLeft").addEventListener("click", () => {
-      tapLCount++;
-      setTimeout(() => {
-        if(tapLCount >= 2){
-          player.currentTime(Math.max(0, player.currentTime() - 10));
-          showInd(document.getElementById("indLeft"));
-        } else if(tapLCount === 1){
-          player.paused() ? player.play() : player.pause();
-        }
-        tapLCount = 0;
-      }, 280);
-    });
-
-    document.getElementById("tapRight").addEventListener("click", () => {
-      tapRCount++;
-      setTimeout(() => {
-        if(tapRCount >= 2){
-          player.currentTime(Math.min(player.duration() || 1e9, player.currentTime() + 10));
-          showInd(document.getElementById("indRight"));
-        } else if(tapRCount === 1){
-          player.paused() ? player.play() : player.pause();
-        }
-        tapRCount = 0;
-      }, 280);
-    });
-
-    window.addEventListener("orientationchange", () => {
-      setTimeout(() => { player.dimensions(document.querySelector(".video-wrap").offsetWidth, null); }, 300);
-    });
-  } else {
-    document.getElementById("title").innerText = "No video URL provided!";
-  }
-}
+player.on("error", () => {
+  player.src({ src: "/api/proxy?url=" + encodeURIComponent(rawUrl), type: "video/mp4" });
+  player.play();
+});
 </script>
 </body>
 </html>
