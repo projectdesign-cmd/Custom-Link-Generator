@@ -16,7 +16,7 @@
   .meta input { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 8px 10px; border-radius: 6px; font-size: 13px; }
   .meta input:focus { outline: none; border-color: #2563eb; }
   .info-row { display:flex; gap:16px; color:#aaa; font-size:12px; margin-top: 6px; flex-wrap:wrap; }
-  .btn-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .btn-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 8px; }
   .btn { display: inline-block; padding: 10px 20px; background: #2563eb; color: #fff; border-radius: 6px; text-decoration: none; font-size: 14px; cursor: pointer; border: none; }
   .btn:hover { background: #1d4ed8; }
   .btn.green { background: #16a34a; }
@@ -54,7 +54,7 @@
     <div class="info-row">
       <span>Duration: <b id="metaDuration" style="color:#fff;">-</b></span>
       <span>Resolution: <b id="metaRes" style="color:#fff;">-</b></span>
-      <span id="sizeRow" style="display:none;">Size: <b id="metaSize" style="color:#fff;">-</b></span>
+      <span>Size: <b id="metaSize" style="color:#fff;">Detecting...</b></span>
     </div>
   </div>
   <div class="btn-row">
@@ -81,6 +81,7 @@
   var downloadBtn = document.getElementById('downloadBtn');
   var copyBtn = document.getElementById('copyBtn');
   var progressEl = document.getElementById('progress');
+  var metaSize = document.getElementById('metaSize');
 
   function getFileName(u) {
     try {
@@ -88,9 +89,7 @@
       var parts = decoded.split('/');
       var last = parts[parts.length - 1].split('?')[0];
       return last || 'video.mp4';
-    } catch (e) {
-      return 'video.mp4';
-    }
+    } catch (e) { return 'video.mp4'; }
   }
 
   function getExt(name) {
@@ -103,6 +102,35 @@
     var idx = name.lastIndexOf('.');
     if (idx === -1) return name;
     return name.substring(0, idx);
+  }
+
+  function formatBytes(bytes) {
+    if (!bytes || bytes <= 0) return 'Unknown';
+    if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(2) + ' GB';
+    if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + ' MB';
+    if (bytes >= 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return bytes + ' B';
+  }
+
+  function detectFileSize(u) {
+    // If size already given in URL params, use it
+    if (sizeParam) {
+      metaSize.textContent = decodeURIComponent(sizeParam);
+      return;
+    }
+    // Try HEAD request to get Content-Length
+    fetch(u, { method: 'HEAD' })
+      .then(function(res) {
+        var cl = res.headers.get('content-length');
+        if (cl && parseInt(cl) > 0) {
+          metaSize.textContent = formatBytes(parseInt(cl));
+        } else {
+          metaSize.textContent = 'Unknown';
+        }
+      })
+      .catch(function() {
+        metaSize.textContent = 'Unknown';
+      });
   }
 
   var PLAYABLE_EXT = ['mp4', 'webm', 'ogg', 'ogv', 'mov', 'm4v'];
@@ -119,10 +147,7 @@
     fileNameInput.value = fileName;
     titleTagInput.value = stripExt(displayTitle);
 
-    if (sizeParam) {
-      document.getElementById('sizeRow').style.display = 'inline';
-      document.getElementById('metaSize').textContent = decodeURIComponent(sizeParam);
-    }
+    detectFileSize(decodedUrl);
 
     if (PLAYABLE_EXT.indexOf(ext) === -1) {
       player.style.display = 'none';
