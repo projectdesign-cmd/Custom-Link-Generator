@@ -15,12 +15,9 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .meta{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
 .size-badge{background:#333;color:#fff;font-size:13px;padding:3px 10px;border-radius:4px}
 .quality{color:#aaa;font-size:14px}
-.tg-banner{display:flex;align-items:center;justify-content:space-between;background:#0088cc;border-radius:8px;padding:10px 16px;margin-bottom:10px;flex-wrap:wrap;gap:8px}
-.tg-banner span{font-size:13px;color:#fff}
-.tg-banner a{background:#fff;color:#0088cc;font-size:13px;font-weight:bold;padding:6px 14px;border-radius:6px;text-decoration:none;white-space:nowrap}
-.btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#16a34a;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
+.btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;color:#000;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
+.btn-tg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#0088cc;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
 .btn-fit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#1a73e8;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;border:none;cursor:pointer;margin-bottom:10px}
-.btn-copy{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#333;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;border:none;cursor:pointer;margin-bottom:10px}
 .settings-panel{background:#222;border-radius:8px;padding:14px;margin-bottom:10px}
 .settings-panel h3{font-size:14px;color:#aaa;margin-bottom:10px}
 .lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
@@ -48,13 +45,8 @@ video.fit{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;obje
     <span class="quality" id="qualityBadge"></span>
   </div>
 
-  <div class="tg-banner">
-    <span>📺 Watch All Telugu TV Shows</span>
-    <a href="https://t.me/AllTeluguTvShowsWatchHere" target="_blank">➤ Join Telegram</a>
-  </div>
-
   <a id="dlbtn" class="btn-dl" href="#" target="_blank">⬇ Download</a>
-  <button class="btn-copy" id="copyBtn" onclick="copyLink()">📋 Copy Direct Link</button>
+  <a class="btn-tg" href="https://t.me/AllTeluguTvShowsWatchHere" target="_blank">📺 Join Telegram Channel</a>
   <button class="btn-fit" onclick="toggleFit()">⛶ Fit to Screen</button>
 
   <div class="settings-panel" id="langPanel" style="display:none">
@@ -188,15 +180,6 @@ function toggleFit() {
   var v = document.querySelector("video");
   v.classList.toggle("fit", isFit);
   if (isFit) player.play();
-}
-
-function copyLink() {
-  if (!rawUrl) return;
-  navigator.clipboard.writeText(rawUrl).then(function() {
-    var btn = document.getElementById("copyBtn");
-    btn.innerText = "✅ Copied!";
-    setTimeout(function() { btn.innerText = "📋 Copy Direct Link"; }, 1500);
-  });
 }
 </script>
 </body>
