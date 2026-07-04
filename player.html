@@ -113,20 +113,26 @@
   }
 
   function detectFileSize(u) {
-    // If size already given in URL params, use it
     if (sizeParam) {
       metaSize.textContent = decodeURIComponent(sizeParam);
       return;
     }
-    // Try HEAD request to get Content-Length
-    fetch(u, { method: 'HEAD' })
+    fetch(u, { method: 'GET', headers: { 'Range': 'bytes=0-0' } })
       .then(function(res) {
-        var cl = res.headers.get('content-length');
-        if (cl && parseInt(cl) > 0) {
-          metaSize.textContent = formatBytes(parseInt(cl));
-        } else {
-          metaSize.textContent = 'Unknown';
+        var cr = res.headers.get('content-range');
+        if (cr) {
+          var match = cr.match(/\/(\d+)$/);
+          if (match) {
+            metaSize.textContent = formatBytes(parseInt(match[1]));
+            return;
+          }
         }
+        var cl = res.headers.get('content-length');
+        if (cl && parseInt(cl) > 1) {
+          metaSize.textContent = formatBytes(parseInt(cl));
+          return;
+        }
+        metaSize.textContent = 'Unknown';
       })
       .catch(function() {
         metaSize.textContent = 'Unknown';
