@@ -4,63 +4,171 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Video Player</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video-js.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center}
-.video-wrap{width:100%;max-width:900px}
-.info-box{width:100%;max-width:900px;padding:16px}
-.file-title{font-size:20px;font-weight:bold;line-height:1.3;margin-bottom:10px}
-.meta{display:flex;gap:10px;margin-bottom:16px;align-items:center}
-.size-badge{background:#333;color:#fff;font-size:13px;padding:3px 10px;border-radius:4px}
-.quality{color:#aaa;font-size:14px}
-.btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;color:#000;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
-.btn-tg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#229ED9;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
-.vjs-tech{transition:object-fit 0.2s}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #111; color: #fff; font-family: Arial, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 16px; }
+  .container { width: 100%; max-width: 860px; }
+  h1 { font-size: 15px; padding: 10px 0; color: #eee; word-break: break-all; line-height: 1.5; }
+  video { width: 100%; background: #000; border-radius: 8px; margin-bottom: 12px; }
+  .meta { background: #1e1e1e; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; font-size: 13px; color: #aaa; }
+  .meta .row { margin-bottom: 10px; }
+  .meta label { display:block; margin-bottom:4px; color:#888; font-size:12px; }
+  .meta input { width: 100%; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 8px 10px; border-radius: 6px; font-size: 13px; }
+  .meta input:focus { outline: none; border-color: #2563eb; }
+  .info-row { display:flex; gap:16px; color:#aaa; font-size:12px; margin-top: 6px; flex-wrap:wrap; }
+  .btn-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .btn { display: inline-block; padding: 10px 20px; background: #2563eb; color: #fff; border-radius: 6px; text-decoration: none; font-size: 14px; cursor: pointer; border: none; }
+  .btn:hover { background: #1d4ed8; }
+  .btn.green { background: #16a34a; }
+  .btn.green:hover { background: #15803d; }
+  .btn.tg { background: #0088cc; }
+  .btn.tg:hover { background: #006fa8; }
+  .btn:disabled { background: #555; cursor: not-allowed; }
+  .tg-banner { display:flex; align-items:center; justify-content:space-between; background:#0088cc; border-radius:8px; padding:10px 16px; margin-bottom:12px; flex-wrap:wrap; gap:8px; }
+  .tg-banner span { font-size:13px; color:#fff; }
+  .tg-banner a { background:#fff; color:#0088cc; font-size:13px; font-weight:bold; padding:6px 14px; border-radius:6px; text-decoration:none; white-space:nowrap; }
+  .tg-banner a:hover { background:#e0f0ff; }
+  .error { color: #ff4444; padding: 16px; text-align: left; background:#2a1414; border-radius:8px; margin-bottom:12px; font-size:13px; line-height:1.6; }
+  .warn { color: #ffb020; padding: 12px 16px; text-align: left; background:#2a230f; border-radius:8px; margin-bottom:12px; font-size:13px; line-height:1.6; }
+  .progress { font-size: 12px; color: #888; margin-top: 6px; }
 </style>
 </head>
 <body>
-<div class="video-wrap">
-  <video-js id="player" class="vjs-default-skin vjs-big-play-centered"
-    controls autoplay playsinline preload="auto"
-    style="width:100%;min-height:220px">
-  </video-js>
-</div>
-
-<div class="info-box">
-  <div class="file-title" id="title">Loading...</div>
-  <div class="meta">
-    <span class="size-badge" id="sizeBadge">HD</span>
-    <span class="quality">HD</span>
+<div class="container">
+  <div class="tg-banner">
+    <span>📺 Watch All Telugu TV Shows</span>
+    <a href="https://t.me/AllTeluguTvShowsWatchHere" target="_blank">➤ Join Telegram</a>
   </div>
-  <a id="dlbtn" class="btn-dl" href="#" target="_blank">⬇ Download</a>
-  <a class="btn-tg" href="https://t.me/MadForEachOtherShow" target="_blank">📢 Join Telegram Channel</a>
+  <h1 id="title">Loading...</h1>
+  <div id="unsupportedBox" class="warn" style="display:none;"></div>
+  <video id="player" controls autoplay playsinline></video>
+  <div class="meta">
+    <div class="row">
+      <label>File Name (used for download)</label>
+      <input type="text" id="fileNameInput" />
+    </div>
+    <div class="row">
+      <label>Title Tag</label>
+      <input type="text" id="titleTagInput" />
+    </div>
+    <div class="info-row">
+      <span>Duration: <b id="metaDuration" style="color:#fff;">-</b></span>
+      <span>Resolution: <b id="metaRes" style="color:#fff;">-</b></span>
+      <span id="sizeRow" style="display:none;">Size: <b id="metaSize" style="color:#fff;">-</b></span>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn green" id="downloadBtn">Download</button>
+    <button class="btn" id="copyBtn">Copy Direct Link</button>
+    <a class="btn tg" href="https://t.me/AllTeluguTvShowsWatchHere" target="_blank">➤ Join Telegram</a>
+  </div>
+  <div class="progress" id="progress"></div>
+  <p class="error" id="error" style="display:none;"></p>
 </div>
 
 <script>
-const params = new URLSearchParams(window.location.search);
-const rawUrl = params.get("url");
-const title = params.get("title") || "Video";
-const size = params.get("size") || "HD";
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var url = params.get('url');
+  var titleParam = params.get('title');
+  var sizeParam = params.get('size');
+  var player = document.getElementById('player');
+  var titleEl = document.getElementById('title');
+  var errorEl = document.getElementById('error');
+  var unsupportedBox = document.getElementById('unsupportedBox');
+  var fileNameInput = document.getElementById('fileNameInput');
+  var titleTagInput = document.getElementById('titleTagInput');
+  var downloadBtn = document.getElementById('downloadBtn');
+  var copyBtn = document.getElementById('copyBtn');
+  var progressEl = document.getElementById('progress');
 
-document.getElementById("title").innerText = title;
-document.title = title;
-document.getElementById("sizeBadge").innerText = size;
-document.getElementById("dlbtn").href = rawUrl || "#";
+  function getFileName(u) {
+    try {
+      var decoded = decodeURIComponent(u);
+      var parts = decoded.split('/');
+      var last = parts[parts.length - 1].split('?')[0];
+      return last || 'video.mp4';
+    } catch (e) {
+      return 'video.mp4';
+    }
+  }
 
-const player = videojs("player", {
-  sources: [{ src: rawUrl, type: "video/mp4" }],
-  controls: true,
-  autoplay: true,
-  preload: "auto",
-  fluid: true,
-});
+  function getExt(name) {
+    var idx = name.lastIndexOf('.');
+    if (idx === -1) return '';
+    return name.substring(idx + 1).toLowerCase();
+  }
 
-player.on("error", () => {
-  player.src({ src: "/api/proxy?url=" + encodeURIComponent(rawUrl), type: "video/mp4" });
-  player.play();
-});
+  function stripExt(name) {
+    var idx = name.lastIndexOf('.');
+    if (idx === -1) return name;
+    return name.substring(0, idx);
+  }
+
+  var PLAYABLE_EXT = ['mp4', 'webm', 'ogg', 'ogv', 'mov', 'm4v'];
+  var decodedUrl = '';
+
+  if (url) {
+    decodedUrl = decodeURIComponent(url);
+    var fileName = getFileName(url);
+    var ext = getExt(fileName);
+    var displayTitle = titleParam ? decodeURIComponent(titleParam) : fileName;
+
+    titleEl.textContent = displayTitle;
+    document.title = displayTitle;
+    fileNameInput.value = fileName;
+    titleTagInput.value = stripExt(displayTitle);
+
+    if (sizeParam) {
+      document.getElementById('sizeRow').style.display = 'inline';
+      document.getElementById('metaSize').textContent = decodeURIComponent(sizeParam);
+    }
+
+    if (PLAYABLE_EXT.indexOf(ext) === -1) {
+      player.style.display = 'none';
+      unsupportedBox.style.display = 'block';
+      unsupportedBox.textContent = 'This is a .' + ext.toUpperCase() + ' file. Most browsers cannot stream/play .' + ext + ' files directly in-page. Use the Download button below to save it and play it in a video app (VLC, MX Player, etc).';
+    } else {
+      player.src = decodedUrl;
+      player.onloadedmetadata = function() {
+        var d = Math.floor(player.duration);
+        var h = Math.floor(d / 3600);
+        var m = Math.floor((d % 3600) / 60);
+        var s = d % 60;
+        document.getElementById('metaDuration').textContent = (h > 0 ? h + 'h ' : '') + m + 'm ' + s + 's';
+        document.getElementById('metaRes').textContent = player.videoWidth + ' x ' + player.videoHeight;
+      };
+      player.onerror = function() {
+        player.style.display = 'none';
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'This video could not be played in-browser. The link may be broken/expired, or the codec inside this file is unsupported. Try the Download button instead.';
+      };
+    }
+  } else {
+    errorEl.style.display = 'block';
+    errorEl.textContent = 'No video URL provided!';
+  }
+
+  downloadBtn.onclick = function() {
+    if (!decodedUrl) return;
+    var customName = fileNameInput.value.trim() || 'video.mp4';
+    var a = document.createElement('a');
+    a.href = decodedUrl;
+    a.download = customName;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    progressEl.textContent = "If download doesn't start automatically, long-press the video link or open it directly in your browser.";
+  };
+
+  copyBtn.onclick = function() {
+    navigator.clipboard.writeText(decodedUrl).then(function() {
+      copyBtn.textContent = 'Copied!';
+      setTimeout(function() { copyBtn.textContent = 'Copy Direct Link'; }, 1500);
+    });
+  };
+})();
 </script>
 </body>
 </html>
