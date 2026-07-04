@@ -1,61 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Video Player with Telegram Link</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #222;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-        video {
-            width: 80%;
-            max-width: 800px;
-            height: auto;
-            background-color: #000;
-        }
-        .link-container {
-            margin-top: 20px;
-            font-size: 1.2em;
-        }
-        a {
-            color: #00f;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Video Player</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video-js.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.video-wrap{width:100%;max-width:900px}
+.info-box{width:100%;max-width:900px;padding:16px}
+.file-title{font-size:20px;font-weight:bold;line-height:1.3;margin-bottom:10px}
+.meta{display:flex;gap:10px;margin-bottom:16px;align-items:center}
+.size-badge{background:#333;color:#fff;font-size:13px;padding:3px 10px;border-radius:4px}
+.quality{color:#aaa;font-size:14px}
+.btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;color:#000;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
+.btn-fit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#1a73e8;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;border:none;cursor:pointer;margin-bottom:10px}
+.settings-panel{background:#222;border-radius:8px;padding:14px;margin-bottom:10px}
+.settings-panel h3{font-size:14px;color:#aaa;margin-bottom:10px}
+.lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.lang-btn{padding:10px;background:#333;border:none;color:#fff;border-radius:6px;text-align:center;cursor:pointer;font-size:14px;text-decoration:none;display:block}
+.lang-btn.active{background:#1a73e8}
+.sub-list{display:flex;flex-direction:column;gap:6px}
+.sub-btn{padding:10px;background:#333;border:none;color:#fff;border-radius:6px;text-align:left;cursor:pointer;font-size:14px}
+.sub-btn.active{background:#1db954}
+video.fit{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;object-fit:contain;background:#000}
+</style>
 </head>
 <body>
+<div class="video-wrap">
+  <video-js id="player" class="vjs-default-skin vjs-big-play-centered"
+    controls autoplay playsinline preload="auto"
+    style="width:100%;min-height:220px">
+  </video-js>
+</div>
 
-    <h1>Watch Video</h1>
-    <video id="videoPlayer" controls autoplay>
-        <source src="https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4" type="video/mp4" />
-        Your browser does not support HTML5 video.
-    </video>
+<div class="info-box">
+  <div class="file-title" id="title">Loading...</div>
+  <div class="meta">
+    <span class="size-badge" id="sizeBadge">HD</span>
+    <span class="quality">HD</span>
+  </div>
 
-    <div class="link-container">
-        Join our Telegram Channel: <a href="https://t.me/AllTeluguTvShowsWatchHere" target="_blank">https://t.me/AllTeluguTvShowsWatchHere</a>
+  <button class="btn-fit" onclick="toggleFit()">⛶ Fit to Screen</button>
+
+  <div class="settings-panel" id="langPanel" style="display:none">
+    <h3>🔊 Audio Language</h3>
+    <div class="lang-grid" id="langList"></div>
+    <h3>💬 Subtitles</h3>
+    <div class="sub-list" id="subTracks">
+      <div style="color:#aaa;font-size:13px">No subtitles detected</div>
     </div>
+  </div>
 
-    <script>
-        // Optional: dynamically set video source from URL parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const videoSrc = urlParams.get('url');
-        if (videoSrc) {
-            document.getElementById('videoPlayer').src = videoSrc;
-        }
-    </script>
+  <!-- Updated link to your Telegram channel -->
+  <a id="dlbtn" class="btn-dl" href="https://t.me/AllTeluguTvShowsWatchHere" target="_blank">⬇ Download</a>
+</div>
 
+<script>
+const params = new URLSearchParams(window.location.search);
+const rawUrl = params.get("url");
+const title = params.get("title") || "Video";
+const size = params.get("size") || "HD";
+const langParam = params.get("langs") || "";
+const activeLang = params.get("lang") || "";
+
+document.getElementById("title").innerText = title;
+document.title = title;
+document.getElementById("sizeBadge").innerText = size;
+document.getElementById("dlbtn").href = rawUrl || "#";
+
+let isFit = false;
+
+const player = videojs("player", {
+  sources: [{ src: rawUrl, type: "video/mp4" }],
+  controls: true,
+  autoplay: true,
+  preload: "auto",
+  fluid: true,
+});
+
+player.on("error", () => {
+  player.src({ src: "/api/proxy?url=" + encodeURIComponent(rawUrl), type: "video/mp4" });
+  player.play();
+});
+
+// Language buttons from URL
+// Format: langs=Hindi|URL1,Telugu|URL2,Tamil|URL3,Malayalam|URL4
+if(langParam){
+  document.getElementById("langPanel").style.display = "block";
+  const langDiv = document.getElementById("langList");
+  langDiv.innerHTML = "";
+  const langs = langParam.split(",");
+  langs.forEach(l => {
+    const parts = l.split("|");
+    const name = parts[0].trim();
+    const url = parts[1] ? parts[1].trim() : rawUrl;
+    const isActive = activeLang === name || (!activeLang && langs.indexOf(l) === 0);
+    const btn = document.createElement("a");
+    btn.className = "lang-btn" + (isActive ? " active" : "");
+    btn.innerText = "🔊 " + name;
+    // Build new watch link with selected language
+    const newParams = new URLSearchParams(params);
+    newParams.set("url", url);
+    newParams.set("lang", name);
+    btn.href = "?" + newParams.toString();
+    langDiv.appendChild(btn);
+  });
+}
+
+// Subtitles
+player.on("loadedmetadata", () => {
+  const subDiv = document.getElementById("subTracks");
+  const textTracks = player.textTracks();
+  const subs = [];
+  for(let i=0; i<textTracks.length; i++){
+    if(textTracks[i].kind === "subtitles" || textTracks[i].kind === "captions") subs.push(textTracks[i]);
+  }
+  if(subs.length > 0){
+    subDiv.innerHTML = "";
+    const offBtn = document.createElement("button");
+    offBtn.className = "sub-btn active";
+    offBtn.innerText = "❌ Off";
+    offBtn.onclick = () => {
+      subs.forEach(t => t.mode = "hidden");
+      document.querySelectorAll(".sub-btn").forEach(b=>b.classList.remove("active"));
+      offBtn.classList.add("active");
+    };
+    subDiv.appendChild(offBtn);
+    subs.forEach((t, i) => {
+      const btn = document.createElement("button");
+      btn.className = "sub-btn";
+      btn.innerText = "💬 " + (t.label || "Subtitle "+(i+1));
+      btn.onclick = () => {
+        subs.forEach(s => s.mode = "hidden");
+        t.mode = "showing";
+        document.querySelectorAll(".sub-btn").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+      };
+      subDiv.appendChild(btn);
+    });
+    document.getElementById("langPanel").style.display = "block";
+  }
+});
+
+function toggleFit(){
+  isFit = !isFit;
+  const v = document.querySelector("video");
+  v.classList.toggle("fit", isFit);
+  if(isFit) player.play();
+}
+</script>
 </body>
 </html>
