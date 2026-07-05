@@ -17,7 +17,6 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .quality{color:#aaa;font-size:14px}
 .btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;color:#000;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
 .btn-tg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#0088cc;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
-.btn-fit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#1a73e8;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;border:none;cursor:pointer;margin-bottom:10px}
 .settings-panel{background:#222;border-radius:8px;padding:14px;margin-bottom:10px}
 .settings-panel h3{font-size:14px;color:#aaa;margin-bottom:10px}
 .lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
@@ -26,7 +25,6 @@ body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;di
 .sub-list{display:flex;flex-direction:column;gap:6px}
 .sub-btn{padding:10px;background:#333;border:none;color:#fff;border-radius:6px;text-align:left;cursor:pointer;font-size:14px}
 .sub-btn.active{background:#1db954}
-video.fit{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;object-fit:contain;background:#000}
 </style>
 </head>
 <body>
@@ -47,7 +45,6 @@ video.fit{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;obje
 
   <a id="dlbtn" class="btn-dl" href="#" target="_blank">⬇ Download</a>
   <a class="btn-tg" href="https://t.me/AllTeluguTvShowsWatchHere" target="_blank">📺 Join Telegram Channel</a>
-  <button class="btn-fit" onclick="toggleFit()">⛶ Fit to Screen</button>
 
   <div class="settings-panel" id="langPanel" style="display:none">
     <h3>🔊 Audio Language</h3>
@@ -104,8 +101,6 @@ else if (title.indexOf("720") !== -1) qualityBadge.innerText = "720p";
 else if (title.indexOf("480") !== -1) qualityBadge.innerText = "480p";
 else if (title.indexOf("360") !== -1) qualityBadge.innerText = "360p";
 else qualityBadge.innerText = "HD";
-
-var isFit = false;
 
 var player = videojs("player", {
   sources: [{ src: rawUrl, type: "video/mp4" }],
@@ -174,13 +169,6 @@ player.on("loadedmetadata", function() {
     document.getElementById("langPanel").style.display = "block";
   }
 });
-
-function toggleFit() {
-  isFit = !isFit;
-  var v = document.querySelector("video");
-  v.classList.toggle("fit", isFit);
-  if (isFit) player.play();
-}
 </script>
 </body>
 </html>
