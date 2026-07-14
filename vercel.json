@@ -2,6 +2,11 @@
   "version": 2,
   "redirects": [
     {
+      "source": "/megas/:id",
+      "destination": "https://magas.rest/:id",
+      "permanent": false
+    },
+    {
       "source": "/kmcgfiles/:id/:filename",
       "destination": "https://mgly.casa/:id",
       "permanent": false
