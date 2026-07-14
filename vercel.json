@@ -4,12 +4,12 @@
   "redirects": [
     {
       "source": "/kmcgfiles/:id/:filename",
-      "destination": "https://mgly.casa/:id",
+      "destination": "https://magas.rest/:id",
       "permanent": false
     },
     {
       "source": "/kmcgfiles/:path*",
-      "destination": "https://mgly.casa/:path*",
+      "destination": "https://magas.rest/:path*",
       "permanent": false
     },
     {
@@ -25,6 +25,11 @@
     {
       "source": "/filedollar/:path*",
       "destination": "https://filedollar.top/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/earn/:path*",
+      "destination": "https://earnbylink.com/:path*",
       "permanent": false
     }
   ],
