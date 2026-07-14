@@ -4,12 +4,12 @@
   "redirects": [
     {
       "source": "/kmcgfiles/:id/:filename",
-      "destination": "https://magas.rest/:id",
+      "destination": "https://mgly.casa/:id",
       "permanent": false
     },
     {
       "source": "/kmcgfiles/:path*",
-      "destination": "https://magas.rest/:path*",
+      "destination": "https://mgly.casa/:path*",
       "permanent": false
     },
     {
