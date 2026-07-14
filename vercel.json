@@ -1,75 +1,30 @@
 {
-
-  "version": 2,
-
-
-
-  "redirects": [
-
-    {
-
-      "source": "/kmcgfiles/:id/:filename",
-
-      "destination": "https://mgly.casa/:id",
-
-      "permanent": false
-
-    },
-
-    {
-
-      "source": "/kmcgfiles/:path*",
-
-      "destination": "https://mgly.casa/:path*",
-
-      "permanent": false
-
-    },
-
-    {
-
-      "source": "/koyeb/:path*",
-
-      "destination": "http://file-to-link-stevebotz-01.koyeb.app/:path*",
-
-      "permanent": false
-
-    },
-
-    {
-
-      "source": "/heroku/:path*",
-
-      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*",
-
-      "permanent": false
-
-    },
-
-    {
-
-      "source": "/filedollar/:path*",
-
-      "destination": "https://filedollar.top/:path*",
-
-      "permanent": false
-
-    }
-
-  ],
-
-
-
-  "functions": {
-
-    "api/proxy.js": {
-
-      "memory": 1024,
-
-      "maxDuration": 30
-
-    }
-
-  }
-
+  "version": 2,
+  "redirects": [
+    {
+      "source": "/kmcgfiles/:id/:filename",
+      "destination": "https://mgly.casa/:id",
+      "permanent": false
+    },
+    {
+      "source": "/kmcgfiles/:path*",
+      "destination": "https://mgly.casa/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/koyeb/:path*",
+      "destination": "https://file-to-link-stevebotz-01.koyeb.app/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/heroku/:path*",
+      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/filedollar/:path*",
+      "destination": "https://filedollar.top/:path*",
+      "permanent": false
+    }
+  ]
 }
