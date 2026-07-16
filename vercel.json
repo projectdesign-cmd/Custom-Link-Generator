@@ -3,22 +3,17 @@
   "redirects": [
     {
       "source": "/kmcgfiles/:id/:filename",
-      "destination": "https://mgly.casa/:id",
+      "destination": "https://mgly.living/:id",
       "permanent": false
     },
     {
       "source": "/kmcgfiles/:path*",
-      "destination": "https://mgly.casa/:path*",
-      "permanent": false
-    },
-    {
-      "source": "/magas/:id",
-      "destination": "https://mgly.casa/:id",
+      "destination": "https://mgly.living/:path*",
       "permanent": false
     },
     {
       "source": "/magas/:path*",
-      "destination": "https://mgly.casa/:path*",
+      "destination": "https://mgly.living/:path*",
       "permanent": false
     },
     {
@@ -36,5 +31,11 @@
       "destination": "https://filedollar.top/:path*",
       "permanent": false
     }
-  ]
+  ],
+  "functions": {
+    "api/proxy.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  }
 }
