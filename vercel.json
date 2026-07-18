@@ -2,11 +2,6 @@
   "version": 2,
   "redirects": [
     {
-      "source": "/kmcgfiles/:id/:filename",
-      "destination": "https://mgly.living/:id",
-      "permanent": false
-    },
-    {
       "source": "/kmcgfiles/:path*",
       "destination": "https://mgly.living/:path*",
       "permanent": false
