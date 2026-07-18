@@ -1,50 +1,35 @@
 {
-  "version": 2,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
     {
-      "source": "/kmcgfiles/:id/:filename*",
+      "source": "/kmcgfiles/:id/:path*",
       "destination": "https://filedollar.top/:id",
-      "permanent": false
+      "statusCode": 307
     },
     {
-      "source": "/kmcgfiles/:id",
+      "source": "/magas/:id/:path*",
       "destination": "https://filedollar.top/:id",
-      "permanent": false
+      "statusCode": 307
     },
     {
-      "source": "/magas/:id/:filename*",
+      "source": "/filedollar/:id/:path*",
       "destination": "https://filedollar.top/:id",
-      "permanent": false
-    },
-    {
-      "source": "/magas/:id",
-      "destination": "https://filedollar.top/:id",
-      "permanent": false
-    },
-    {
-      "source": "/filedollar/:id/:filename*",
-      "destination": "https://filedollar.top/:id",
-      "permanent": false
-    },
-    {
-      "source": "/filedollar/:id",
-      "destination": "https://filedollar.top/:id",
-      "permanent": false
+      "statusCode": 307
     },
     {
       "source": "/koyeb/:path*",
       "destination": "https://file-to-link-stevebotz-01.koyeb.app/:path*",
-      "permanent": false
+      "statusCode": 307
     },
     {
       "source": "/heroku/:path*",
       "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*",
-      "permanent": false
+      "statusCode": 307
     },
     {
       "source": "/heroku2/:path*",
       "destination": "https://sua-fs1-sed-9087155d4f5a.herokuapp.com/:path*",
-      "permanent": false
+      "statusCode": 307
     }
   ]
 }
