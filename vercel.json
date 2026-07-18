@@ -46,11 +46,5 @@
       "destination": "https://sua-fs1-sed-9087155d4f5a.herokuapp.com/:path*",
       "permanent": false
     }
-  ],
-  "functions": {
-    "api/proxy.js": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  }
+  ]
 }
