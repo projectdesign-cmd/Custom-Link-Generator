@@ -22,6 +22,11 @@
       "permanent": false
     },
     {
+      "source": "/heroku2/:path*",
+      "destination": "https://sua-fs1-sed-9087155d4f5a.herokuapp.com/:path*",
+      "permanent": false
+    },
+    {
       "source": "/filedollar/:path*",
       "destination": "https://filedollar.top/:path*",
       "permanent": false
