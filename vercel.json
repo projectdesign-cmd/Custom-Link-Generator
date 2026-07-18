@@ -2,13 +2,33 @@
   "version": 2,
   "redirects": [
     {
-      "source": "/kmcgfiles/:path*",
-      "destination": "https://filedollar.top/:path*",
+      "source": "/kmcgfiles/:id/:filename*",
+      "destination": "https://filedollar.top/:id",
       "permanent": false
     },
     {
-      "source": "/magas/:path*",
-      "destination": "https://filedollar.top/:path*",
+      "source": "/kmcgfiles/:id",
+      "destination": "https://filedollar.top/:id",
+      "permanent": false
+    },
+    {
+      "source": "/magas/:id/:filename*",
+      "destination": "https://filedollar.top/:id",
+      "permanent": false
+    },
+    {
+      "source": "/magas/:id",
+      "destination": "https://filedollar.top/:id",
+      "permanent": false
+    },
+    {
+      "source": "/filedollar/:id/:filename*",
+      "destination": "https://filedollar.top/:id",
+      "permanent": false
+    },
+    {
+      "source": "/filedollar/:id",
+      "destination": "https://filedollar.top/:id",
       "permanent": false
     },
     {
@@ -24,11 +44,6 @@
     {
       "source": "/heroku2/:path*",
       "destination": "https://sua-fs1-sed-9087155d4f5a.herokuapp.com/:path*",
-      "permanent": false
-    },
-    {
-      "source": "/filedollar/:path*",
-      "destination": "https://filedollar.top/:path*",
       "permanent": false
     }
   ],
