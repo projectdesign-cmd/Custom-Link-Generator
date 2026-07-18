@@ -1,35 +1,42 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "redirects": [
+  "version": 2,
+  "rewrites": [
     {
-      "source": "/kmcgfiles/:id/:path*",
-      "destination": "https://filedollar.top/:id",
-      "statusCode": 307
+      "source": "/kmcgfiles/:id/:filename*",
+      "destination": "/api/redirect?id=:id"
     },
     {
-      "source": "/magas/:id/:path*",
-      "destination": "https://filedollar.top/:id",
-      "statusCode": 307
+      "source": "/kmcgfiles/:id",
+      "destination": "/api/redirect?id=:id"
     },
     {
-      "source": "/filedollar/:id/:path*",
-      "destination": "https://filedollar.top/:id",
-      "statusCode": 307
+      "source": "/magas/:id/:filename*",
+      "destination": "/api/redirect?id=:id"
+    },
+    {
+      "source": "/magas/:id",
+      "destination": "/api/redirect?id=:id"
+    },
+    {
+      "source": "/filedollar/:id/:filename*",
+      "destination": "/api/redirect?id=:id"
+    },
+    {
+      "source": "/filedollar/:id",
+      "destination": "/api/redirect?id=:id"
     },
     {
       "source": "/koyeb/:path*",
-      "destination": "https://file-to-link-stevebotz-01.koyeb.app/:path*",
-      "statusCode": 307
+      "destination": "https://file-to-link-stevebotz-01.koyeb.app/:path*"
     },
     {
       "source": "/heroku/:path*",
-      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*",
-      "statusCode": 307
+      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*"
     },
     {
       "source": "/heroku2/:path*",
-      "destination": "https://sua-fs1-sed-9087155d4f5a.herokuapp.com/:path*",
-      "statusCode": 307
+      "destination": "https://sua-fs1-sed-9087155d4f5a.herokuapp.com/:path*"
     }
   ]
 }
