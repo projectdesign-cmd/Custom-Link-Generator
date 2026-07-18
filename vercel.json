@@ -3,36 +3,8 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/kmcgfiles/:id/:filename*",
-      "destination": "/api/redirect?id=:id"
-    },
-    {
-      "source": "/kmcgfiles/:id",
-      "destination": "/api/redirect?id=:id"
-    },
-    {
-      "source": "/magas/:id/:filename*",
-      "destination": "/api/redirect?id=:id"
-    },
-    {
-      "source": "/magas/:id",
-      "destination": "/api/redirect?id=:id"
-    },
-    {
-      "source": "/filedollar/:id/:filename*",
-      "destination": "/api/redirect?id=:id"
-    },
-    {
-      "source": "/filedollar/:id",
-      "destination": "/api/redirect?id=:id"
-    },
-    {
-      "source": "/koyeb/:path*",
-      "destination": "https://file-to-link-stevebotz-01.koyeb.app/:path*"
-    },
-    {
-      "source": "/heroku/:path*",
-      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*"
+      "source": "/filedollar/:path*",
+      "destination": "https://filedollar.top/:path*"
     },
     {
       "source": "/heroku2/:path*",
