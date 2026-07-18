@@ -3,12 +3,12 @@
   "redirects": [
     {
       "source": "/kmcgfiles/:path*",
-      "destination": "https://mgly.living/:path*",
+      "destination": "https://filedollar.top/:path*",
       "permanent": false
     },
     {
       "source": "/magas/:path*",
-      "destination": "https://mgly.living/:path*",
+      "destination": "https://filedollar.top/:path*",
       "permanent": false
     },
     {
