@@ -1,90 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Video Player</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video-js.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video-js.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#111;color:#fff;font-family:Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center}
 .video-wrap{width:100%;max-width:900px}
 .info-box{width:100%;max-width:900px;padding:16px}
-.file-title{font-size:18px;font-weight:bold;line-height:1.4;margin-bottom:10px}
-.meta{display:flex;gap:10px;margin-bottom:16px;align-items:center}
+.file-title{font-size:18px;font-weight:bold;line-height:1.3;margin-bottom:10px}
+.meta{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
 .size-badge{background:#333;color:#fff;font-size:13px;padding:3px 10px;border-radius:4px}
+.quality{color:#aaa;font-size:14px}
 .btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;color:#000;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
-.btn-tg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#229ED9;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
-.expired-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;text-align:center;width:100%}
-.exp-icon{font-size:70px;margin-bottom:20px}
-.exp-title{font-size:24px;font-weight:bold;color:#e50914;margin-bottom:10px}
-.exp-msg{color:#aaa;margin-bottom:30px;font-size:15px}
-.exp-btn{display:block;width:100%;max-width:400px;padding:14px;border-radius:8px;text-decoration:none;font-size:16px;font-weight:bold;margin-bottom:10px;text-align:center}
+.btn-tg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#0088cc;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
+.settings-panel{background:#222;border-radius:8px;padding:14px;margin-bottom:10px}
+.settings-panel h3{font-size:14px;color:#aaa;margin-bottom:10px}
+.lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.lang-btn{padding:10px;background:#333;border:none;color:#fff;border-radius:6px;text-align:center;cursor:pointer;font-size:14px;text-decoration:none;display:block}
+.lang-btn.active{background:#1a73e8}
+.sub-list{display:flex;flex-direction:column;gap:6px}
+.sub-btn{padding:10px;background:#333;border:none;color:#fff;border-radius:6px;text-align:left;cursor:pointer;font-size:14px}
+.sub-btn.active{background:#1db954}
 </style>
 </head>
 <body>
 
-<div id="mainPlayer" style="width:100%;display:flex;flex-direction:column;align-items:center">
-  <div class="video-wrap">
-    <video-js id="player" class="vjs-default-skin vjs-big-play-centered"
-      controls autoplay playsinline preload="auto"
-      style="width:100%;min-height:220px">
-    </video-js>
-  </div>
-  <div class="info-box">
-    <div class="file-title" id="title">Loading...</div>
-    <div class="meta">
-      <span class="size-badge" id="sizeBadge">HD</span>
-    </div>
-    <a id="dlbtn" class="btn-dl" href="#" target="_blank">⬇ Download</a>
-    <a class="btn-tg" href="https://t.me/MadForEachOtherShow" target="_blank">📢 Join Telegram Channel</a>
-  </div>
+<div class="video-wrap">
+  <video-js id="player" class="vjs-default-skin vjs-big-play-centered"
+    controls autoplay playsinline preload="auto"
+    style="width:100%;min-height:220px">
+  </video-js>
 </div>
 
-<div id="expiredPage" style="display:none;width:100%">
-  <div class="expired-wrap">
-    <div class="exp-icon">⏰</div>
-    <div class="exp-title">Video Player Expired!</div>
-    <div class="exp-msg">This video player has expired.<br>You can still download below!</div>
-    <a id="exp-dl" class="exp-btn" href="#" target="_blank" style="background:#fff;color:#000">⬇ Download Video</a>
-    <a class="exp-btn" href="https://t.me/MadForEachOtherShow" target="_blank" style="background:#229ED9;color:#fff">📢 Join Telegram Channel</a>
+<div class="info-box">
+  <div class="file-title" id="title">Loading...</div>
+  <div class="meta">
+    <span class="size-badge" id="sizeBadge">Detecting...</span>
+    <span class="quality" id="qualityBadge"></span>
+  </div>
+
+  <a id="dlbtn" class="btn-dl" href="#" target="_blank">⬇ Download</a>
+  <a class="btn-tg" href="https://t.me/AllTeluguTvShowsWatchHere" target="_blank">📺 Join Telegram Channel</a>
+
+  <div class="settings-panel" id="langPanel" style="display:none">
+    <h3>🔊 Audio Language</h3>
+    <div class="lang-grid" id="langList"></div>
+    <h3>💬 Subtitles</h3>
+    <div class="sub-list" id="subTracks">
+      <div style="color:#aaa;font-size:13px">No subtitles detected</div>
+    </div>
   </div>
 </div>
 
 <script>
-const params = new URLSearchParams(window.location.search);
-const rawUrl = params.get("url");
-const title = params.get("title") || "Video";
-const size = params.get("size") || "HD";
-const exp = params.get("exp");
-const dlUrl = params.get("dl") || rawUrl;
+var params = new URLSearchParams(window.location.search);
+var rawUrl = params.get("url");
+var title = params.get("title") || "Video";
+var sizeParam = params.get("size") || "";
+var langParam = params.get("langs") || "";
+var activeLang = params.get("lang") || "";
 
-document.getElementById("exp-dl").href = dlUrl || "#";
+document.getElementById("title").innerText = title;
+document.title = title;
+document.getElementById("dlbtn").href = rawUrl || "#";
 
-if(exp && Math.floor(Date.now()/1000) > parseInt(exp)){
-  document.getElementById("mainPlayer").style.display = "none";
-  document.getElementById("expiredPage").style.display = "block";
-} else {
-  document.getElementById("title").innerText = title;
-  document.title = title;
-  document.getElementById("sizeBadge").innerText = size;
-  document.getElementById("dlbtn").href = dlUrl || "#";
-
-  if(rawUrl){
-    const player = videojs("player", {
-      sources: [{ src: rawUrl, type: "video/mp4" }],
-      controls: true,
-      autoplay: true,
-      preload: "auto",
-      fluid: true,
-    });
-    player.on("error", () => {
-      player.src({ src: "/api/proxy?url=" + encodeURIComponent(rawUrl), type: "video/mp4" });
-      player.play();
-    });
-  }
+function formatBytes(bytes) {
+  if (!bytes || bytes <= 0) return "Unknown";
+  if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(2) + " GB";
+  if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + " MB";
+  if (bytes >= 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return bytes + " B";
 }
+
+function detectFileSize(u) {
+  var badge = document.getElementById("sizeBadge");
+  if (sizeParam) { badge.innerText = sizeParam; return; }
+  fetch(u, { method: "GET", headers: { "Range": "bytes=0-0" } })
+    .then(function(res) {
+      var cr = res.headers.get("content-range");
+      if (cr) {
+        var match = cr.match(/\/(\d+)$/);
+        if (match) { badge.innerText = formatBytes(parseInt(match[1])); return; }
+      }
+      var cl = res.headers.get("content-length");
+      if (cl && parseInt(cl) > 1) { badge.innerText = formatBytes(parseInt(cl)); return; }
+      badge.innerText = "Unknown";
+    })
+    .catch(function() { badge.innerText = "Unknown"; });
+}
+
+if (rawUrl) detectFileSize(rawUrl);
+
+var qualityBadge = document.getElementById("qualityBadge");
+if (title.indexOf("1080") !== -1) qualityBadge.innerText = "1080p";
+else if (title.indexOf("720") !== -1) qualityBadge.innerText = "720p";
+else if (title.indexOf("480") !== -1) qualityBadge.innerText = "480p";
+else if (title.indexOf("360") !== -1) qualityBadge.innerText = "360p";
+else qualityBadge.innerText = "HD";
+
+var player = videojs("player", {
+  sources: [{ src: rawUrl, type: "video/mp4" }],
+  controls: true,
+  autoplay: true,
+  preload: "auto",
+  fluid: true,
+});
+
+player.on("error", function() {
+  player.src({ src: "/api/proxy?url=" + encodeURIComponent(rawUrl), type: "video/mp4" });
+  player.play();
+});
+
+if (langParam) {
+  document.getElementById("langPanel").style.display = "block";
+  var langDiv = document.getElementById("langList");
+  langDiv.innerHTML = "";
+  var langs = langParam.split(",");
+  langs.forEach(function(l, idx) {
+    var parts = l.split("|");
+    var name = parts[0].trim();
+    var url = parts[1] ? parts[1].trim() : rawUrl;
+    var isActive = activeLang === name || (!activeLang && idx === 0);
+    var btn = document.createElement("a");
+    btn.className = "lang-btn" + (isActive ? " active" : "");
+    btn.innerText = "🔊 " + name;
+    var newParams = new URLSearchParams(params);
+    newParams.set("url", url);
+    newParams.set("lang", name);
+    btn.href = "?" + newParams.toString();
+    langDiv.appendChild(btn);
+  });
+}
+
+player.on("loadedmetadata", function() {
+  var subDiv = document.getElementById("subTracks");
+  var textTracks = player.textTracks();
+  var subs = [];
+  for (var i = 0; i < textTracks.length; i++) {
+    if (textTracks[i].kind === "subtitles" || textTracks[i].kind === "captions") subs.push(textTracks[i]);
+  }
+  if (subs.length > 0) {
+    subDiv.innerHTML = "";
+    var offBtn = document.createElement("button");
+    offBtn.className = "sub-btn active";
+    offBtn.innerText = "❌ Off";
+    offBtn.onclick = function() {
+      subs.forEach(function(t) { t.mode = "hidden"; });
+      document.querySelectorAll(".sub-btn").forEach(function(b) { b.classList.remove("active"); });
+      offBtn.classList.add("active");
+    };
+    subDiv.appendChild(offBtn);
+    subs.forEach(function(t, i) {
+      var btn = document.createElement("button");
+      btn.className = "sub-btn";
+      btn.innerText = "💬 " + (t.label || "Subtitle " + (i + 1));
+      btn.onclick = function() {
+        subs.forEach(function(s) { s.mode = "hidden"; });
+        t.mode = "showing";
+        document.querySelectorAll(".sub-btn").forEach(function(b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+      };
+      subDiv.appendChild(btn);
+    });
+    document.getElementById("langPanel").style.display = "block";
+  }
+});
 </script>
 </body>
 </html>
