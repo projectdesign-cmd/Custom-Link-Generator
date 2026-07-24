@@ -2,23 +2,13 @@
   "version": 2,
   "redirects": [
     {
-      "source": "/kmcgfiles/:id/:filename",
-      "destination": "https://magas.rest/:id",
+      "source": "/kmcgfiles/:id/:filename*",
+      "destination": "https://earnbylink.com/:id",
       "permanent": false
     },
     {
-      "source": "/kmcgfiles/:path*",
-      "destination": "https://magas.rest/:path*",
-      "permanent": false
-    },
-    {
-      "source": "/koyeb/:path*",
-      "destination": "http://file-to-link-stevebotz-01.koyeb.app/:path*",
-      "permanent": false
-    },
-    {
-      "source": "/heroku/:path*",
-      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*",
+      "source": "/earn/:path*",
+      "destination": "https://earnbylink.com/:path*",
       "permanent": false
     },
     {
@@ -27,15 +17,14 @@
       "permanent": false
     },
     {
-      "source": "/earn/:path*",
-      "destination": "https://earnbylink.com/:path*",
+      "source": "/koyeb/:path*",
+      "destination": "https://file-to-link-stevebotz-01.koyeb.app/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/heroku/:path*",
+      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*",
       "permanent": false
     }
-  ],
-  "functions": {
-    "api/proxy.js": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  }
+  ]
 }
