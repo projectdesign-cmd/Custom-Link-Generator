@@ -3,22 +3,7 @@
   "redirects": [
     {
       "source": "/kmcgfiles/:id/:filename*",
-      "destination": "https://earnbylink.com/:id",
-      "permanent": false
-    },
-    {
-      "source": "/arolinks/:id/:filename*",
       "destination": "https://arolinks.com/:id",
-      "permanent": false
-    },
-    {
-      "source": "/earn/:id/:filename*",
-      "destination": "https://earnbylink.com/:id",
-      "permanent": false
-    },
-    {
-      "source": "/filedollar/:id/:filename*",
-      "destination": "https://filedollar.top/:id",
       "permanent": false
     },
     {
@@ -30,6 +15,17 @@
       "source": "/heroku/:path*",
       "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*",
       "permanent": false
+    },
+    {
+      "source": "/filedollar/:path*",
+      "destination": "https://filedollar.top/:path*",
+      "permanent": false
     }
-  ]
+  ],
+  "functions": {
+    "api/proxy.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  }
 }
