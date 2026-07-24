@@ -7,13 +7,18 @@
       "permanent": false
     },
     {
-      "source": "/earn/:path*",
-      "destination": "https://earnbylink.com/:path*",
+      "source": "/arolinks/:id/:filename*",
+      "destination": "https://arolinks.com/:id",
       "permanent": false
     },
     {
-      "source": "/filedollar/:path*",
-      "destination": "https://filedollar.top/:path*",
+      "source": "/earn/:id/:filename*",
+      "destination": "https://earnbylink.com/:id",
+      "permanent": false
+    },
+    {
+      "source": "/filedollar/:id/:filename*",
+      "destination": "https://filedollar.top/:id",
       "permanent": false
     },
     {
