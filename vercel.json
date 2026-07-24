@@ -2,38 +2,18 @@
   "version": 2,
   "redirects": [
     {
-      "source": "/kmcgfiles/:id/:filename*",
-      "destination": "https://filedollar.top/:id",
+      "source": "/kmcgfiles/:id/:filename",
+      "destination": "https://magas.rest/:id",
       "permanent": false
     },
     {
-      "source": "/kmcgfiles/:id",
-      "destination": "https://filedollar.top/:id",
-      "permanent": false
-    },
-    {
-      "source": "/magas/:id/:filename*",
-      "destination": "https://filedollar.top/:id",
-      "permanent": false
-    },
-    {
-      "source": "/magas/:id",
-      "destination": "https://filedollar.top/:id",
-      "permanent": false
-    },
-    {
-      "source": "/filedollar/:id/:filename*",
-      "destination": "https://filedollar.top/:id",
-      "permanent": false
-    },
-    {
-      "source": "/filedollar/:id",
-      "destination": "https://filedollar.top/:id",
+      "source": "/kmcgfiles/:path*",
+      "destination": "https://magas.rest/:path*",
       "permanent": false
     },
     {
       "source": "/koyeb/:path*",
-      "destination": "https://file-to-link-stevebotz-01.koyeb.app/:path*",
+      "destination": "http://file-to-link-stevebotz-01.koyeb.app/:path*",
       "permanent": false
     },
     {
@@ -42,8 +22,13 @@
       "permanent": false
     },
     {
-      "source": "/heroku2/:path*",
-      "destination": "https://sua-fs1-sed-9087155d4f5a.herokuapp.com/:path*",
+      "source": "/filedollar/:path*",
+      "destination": "https://filedollar.top/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/earn/:path*",
+      "destination": "https://earnbylink.com/:path*",
       "permanent": false
     }
   ],
