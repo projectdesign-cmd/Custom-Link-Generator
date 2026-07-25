@@ -1,29 +1,29 @@
 {
   "version": 2,
-  "redirects": [
+  "rewrites": [
+    {
+      "source": "/kmcgfiles/:id",
+      "destination": "/api/redirect?id=:id"
+    },
     {
       "source": "/kmcgfiles/:id/:filename*",
-      "destination": "https://arolinks.com/:id",
-      "permanent": false
+      "destination": "/api/redirect?id=:id"
     },
     {
       "source": "/koyeb/:path*",
-      "destination": "https://file-to-link-stevebotz-01.koyeb.app/:path*",
-      "permanent": false
+      "destination": "https://file-to-link-stevebotz-01.koyeb.app/:path*"
     },
     {
       "source": "/heroku/:path*",
-      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*",
-      "permanent": false
+      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*"
     },
     {
       "source": "/filedollar/:path*",
-      "destination": "https://filedollar.top/:path*",
-      "permanent": false
+      "destination": "https://filedollar.top/:path*"
     }
   ],
   "functions": {
-    "api/proxy.js": {
+    "api/redirect.js": {
       "memory": 1024,
       "maxDuration": 30
     }
