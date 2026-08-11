@@ -1,61 +1,9 @@
 {
-  "version": 2,
-  "redirects": [
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
     {
-      "source": "/ad/:path*",
-      "destination": "https://www.effectivecpmnetwork.com/:path*",
-      "permanent": false
-    },
-    {
-      "source": "/kmcgfiles/:id/:filename*",
-      "destination": "https://filedollar.top/:id",
-      "permanent": false
-    },
-    {
-      "source": "/kmcgfiles/:id",
-      "destination": "https://filedollar.top/:id",
-      "permanent": false
-    },
-    {
-      "source": "/magas/:id/:filename*",
-      "destination": "https://filedollar.top/:id",
-      "permanent": false
-    },
-    {
-      "source": "/magas/:id",
-      "destination": "https://filedollar.top/:id",
-      "permanent": false
-    },
-    {
-      "source": "/filedollar/:id/:filename*",
-      "destination": "https://filedollar.top/:id",
-      "permanent": false
-    },
-    {
-      "source": "/filedollar/:id",
-      "destination": "https://filedollar.top/:id",
-      "permanent": false
-    },
-    {
-      "source": "/koyeb/:path*",
-      "destination": "https://file-to-link-stevebotz-01.koyeb.app/:path*",
-      "permanent": false
-    },
-    {
-      "source": "/heroku/:path*",
-      "destination": "https://halal-fs1-iabsbs-93f76f34d0c9.herokuapp.com/:path*",
-      "permanent": false
-    },
-    {
-      "source": "/heroku2/:path*",
-      "destination": "https://sua-fs1-sed-9087155d4f5a.herokuapp.com/:path*",
-      "permanent": false
+      "source": "/ad/:id",
+      "destination": "/api/ad?id=:id"
     }
-  ],
-  "functions": {
-    "api/proxy.js": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  }
+  ]
 }
