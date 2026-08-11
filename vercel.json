@@ -2,8 +2,38 @@
   "version": 2,
   "redirects": [
     {
+      "source": "/ad/:path*",
+      "destination": "https://www.effectivecpmnetwork.com/:path*",
+      "permanent": false
+    },
+    {
       "source": "/kmcgfiles/:id/:filename*",
-      "destination": "https://arolinks.com/:id",
+      "destination": "https://filedollar.top/:id",
+      "permanent": false
+    },
+    {
+      "source": "/kmcgfiles/:id",
+      "destination": "https://filedollar.top/:id",
+      "permanent": false
+    },
+    {
+      "source": "/magas/:id/:filename*",
+      "destination": "https://filedollar.top/:id",
+      "permanent": false
+    },
+    {
+      "source": "/magas/:id",
+      "destination": "https://filedollar.top/:id",
+      "permanent": false
+    },
+    {
+      "source": "/filedollar/:id/:filename*",
+      "destination": "https://filedollar.top/:id",
+      "permanent": false
+    },
+    {
+      "source": "/filedollar/:id",
+      "destination": "https://filedollar.top/:id",
       "permanent": false
     },
     {
@@ -17,8 +47,8 @@
       "permanent": false
     },
     {
-      "source": "/filedollar/:path*",
-      "destination": "https://filedollar.top/:path*",
+      "source": "/heroku2/:path*",
+      "destination": "https://sua-fs1-sed-9087155d4f5a.herokuapp.com/:path*",
       "permanent": false
     }
   ],
