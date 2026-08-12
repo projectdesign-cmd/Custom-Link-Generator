@@ -1,9 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
   "rewrites": [
     {
-      "source": "/ad/:id",
-      "destination": "/api/ad?id=:id"
+      "source": "/kmcgfiles/:id/:filename*",
+      "destination": "/api/redirect?id=:id"
+    },
+    {
+      "source": "/kmcgfiles/:id",
+      "destination": "/api/redirect?id=:id"
     }
   ]
 }
