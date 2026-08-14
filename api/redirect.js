@@ -1,53 +1,48 @@
 export default async function handler(req, res) {
+  const { id, filename } = req.query;
 
   // ==============================
-  // PUT YOUR AROLINKS API TOKEN HERE
+  // REPLACE ONLY THIS API TOKEN
   // ==============================
-  const API_TOKEN = "b9503af56ceea7b40bc91bcb0a3bdad3105fb124";
+  const AROLINKS_API_TOKEN = "b9503af56ceea7b40bc91bcb0a3bdad3105fb124";
 
-
-  // ==============================
-  // GET FILE ID
-  // ==============================
-  const { id } = req.query;
+  // Arolinks API endpoint
+  const API_URL = "https://arolinks.com/api";
 
   if (!id) {
     return res.status(400).send("Missing Arolinks ID");
   }
 
-
-  // ==============================
-  // AROLINKS API
-  // ==============================
   try {
+    const params = new URLSearchParams({
+      api: AROLINKS_API_TOKEN,
+      url: `https://arolinks.com/${id}`
+    });
 
-    const response = await fetch(
-      `https://arolinks.com/api?api=${encodeURIComponent(API_TOKEN)}&url=https://arolinks.com/${encodeURIComponent(id)}`
-    );
-
+    const response = await fetch(`${API_URL}?${params.toString()}`);
     const data = await response.json();
 
-    if (!data || !data.status) {
-      return res.status(500).json({
-        error: "Arolinks API error",
+    // Try common response formats
+    const destination =
+      data?.url ||
+      data?.shortenedUrl ||
+      data?.shortened_url ||
+      data?.link ||
+      data?.result;
+
+    if (!destination) {
+      return res.status(502).json({
+        error: "Arolinks API did not return a redirect URL",
         response: data
       });
     }
 
-    const shortUrl = data.shortenedUrl || data.url;
-
-    if (!shortUrl) {
-      return res.status(500).send("Arolinks did not return a URL");
-    }
-
-    return res.redirect(302, shortUrl);
+    return res.redirect(302, destination);
 
   } catch (error) {
-
     return res.status(500).json({
-      error: "Request failed",
+      error: "Arolinks API request failed",
       message: error.message
     });
-
   }
 }
