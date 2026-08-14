@@ -3,12 +3,8 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/kmcgfiles/:id/:filename*",
-      "destination": "/api/redirect?id=:id"
-    },
-    {
-      "source": "/kmcgfiles/:id",
-      "destination": "/api/redirect?id=:id"
+      "source": "/kmcgfiles/:filename*",
+      "destination": "/api/redirect?filename=:filename*"
     }
   ]
 }
