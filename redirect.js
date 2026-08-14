@@ -1,11 +1,7 @@
-export default function handler(req, res) {
-  const { id } = req.query;
+const LINKS = {
+  "Chef_Mantra_Project_Usa_S1_Ep1_486p_AHA_WEB_DL_Telugu_AAC_2_0_H264.mp4":
+    "CGh6Z",
 
-  if (!id) {
-    return res.status(400).send("Missing file ID");
-  }
-
-  const targetUrl = `https://urlking.in/file_${encodeURIComponent(id)}`;
-
-  res.redirect(302, targetUrl);
-}
+  "Another_File_Name.mp4":
+    "NEW_AROLINKS_ID"
+};
