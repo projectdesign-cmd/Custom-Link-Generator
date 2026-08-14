@@ -3,8 +3,12 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/kmcgfiles/:filename*",
-      "destination": "/api/redirect?filename=:filename*"
+      "source": "/arolinks/:id/:filename*",
+      "destination": "/api/redirect?id=:id&filename=:filename*"
+    },
+    {
+      "source": "/arolinks/:id",
+      "destination": "/api/redirect?id=:id"
     }
   ]
 }
