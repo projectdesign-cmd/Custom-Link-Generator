@@ -3,100 +3,67 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Download</title>
-<!-- Ad Script -->
-<script src="https://www.effectivecpmnetwork.com/g76wq0uk8?key=7692e6337b3c7e4a5882748459c3129a"></script>
+<title>Telugu TV Shows - Today's Episodes</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#f5f5f5;font-family:Arial,sans-serif;color:#222}
-.header{background:#0088cc;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.header{background:#0088cc;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .header h1{color:#fff;font-size:18px}
 .header a{background:#fff;color:#0088cc;padding:6px 14px;border-radius:6px;font-size:13px;font-weight:bold;text-decoration:none}
-.container{max-width:600px;margin:0 auto;padding:20px 16px}
-.file-box{background:#fff;border-radius:10px;padding:20px;margin-bottom:16px;border:1px solid #e0e0e0}
-.file-title{font-size:17px;font-weight:bold;color:#111;margin-bottom:8px;line-height:1.4}
-.file-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.badge{background:#f0f0f0;color:#555;font-size:12px;padding:3px 10px;border-radius:4px}
-.badge.blue{background:#e3f2fd;color:#0088cc}
-.badge.green{background:#e8f5e9;color:#16a34a}
+.container{max-width:700px;margin:0 auto;padding:16px}
+.date-badge{background:#0088cc;color:#fff;font-size:13px;padding:4px 12px;border-radius:4px;display:inline-block;margin-bottom:10px}
+.post-title{font-size:20px;font-weight:bold;margin-bottom:4px;color:#111}
+.post-meta{font-size:12px;color:#888;margin-bottom:16px}
 .disclaimer{background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px 16px;font-size:13px;color:#856404;margin-bottom:16px;line-height:1.6}
-.btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#16a34a;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
-.btn-dl:hover{background:#15803d}
-.btn-watch{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#0088cc;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
-.btn-watch:hover{background:#006fa8}
-.btn-tg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;color:#0088cc;border:2px solid #0088cc;border-radius:8px;font-size:15px;font-weight:bold;text-decoration:none}
-.btn-tg:hover{background:#0088cc;color:#fff}
-.steps{background:#fff;border-radius:10px;padding:16px 20px;border:1px solid #e0e0e0;margin-bottom:16px}
-.steps h3{font-size:14px;color:#888;margin-bottom:10px}
-.step{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-size:13px;color:#444}
-.step-num{background:#0088cc;color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;flex-shrink:0}
-.ad-box{background:#fff;border-radius:10px;padding:16px;border:1px solid #e0e0e0;margin-bottom:16px;text-align:center;min-height:100px}
-.ad-label{font-size:11px;color:#bbb;margin-bottom:8px}
+.show-card{background:#fff;border-radius:8px;padding:14px 16px;margin-bottom:10px;border:1px solid #e0e0e0}
+.show-name{font-size:15px;font-weight:bold;color:#111;margin-bottom:4px}
+.show-meta{font-size:12px;color:#888;margin-bottom:10px}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap}
+.btn-watch{padding:8px 14px;background:#0088cc;color:#fff;border-radius:6px;font-size:13px;font-weight:bold;text-decoration:none;white-space:nowrap}
+.btn-dl{padding:8px 14px;background:#16a34a;color:#fff;border-radius:6px;font-size:13px;font-weight:bold;text-decoration:none;white-space:nowrap}
+.tg-bar{background:#0088cc;padding:12px 20px;text-align:center;margin-top:10px}
+.tg-bar a{background:#fff;color:#0088cc;padding:8px 20px;border-radius:6px;font-size:14px;font-weight:bold;text-decoration:none}
 .footer{text-align:center;padding:20px;font-size:12px;color:#888}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>⬇ Download</h1>
-  <a href="index.html">← Back</a>
+  <h1>📺 Telugu TV Shows</h1>
+  <a href="https://t.me/AllTeluguTvShowsWatchHere" target="_blank">📲 Join Telegram</a>
 </div>
 
 <div class="container">
+  <div class="date-badge" id="dateBadge">Today</div>
+  <div class="post-title">Today's Telugu TV Episodes</div>
+  <div class="post-meta">Updated daily • All shows in one place</div>
 
-  <!-- Ad Box Top -->
-  <div class="ad-box">
-    <div class="ad-label">Advertisement</div>
+  <div class="disclaimer">
+    ⚠️ <b>Disclaimer:</b> We do not host or store any files on our servers.
+    This page functions solely as a link aggregator. We are not responsible
+    for any external content. For removal requests contact admin.
   </div>
 
-  <div class="file-box">
-    <div class="file-title" id="fileTitle">Loading...</div>
-    <div class="file-meta">
-      <span class="badge blue" id="qualityBadge">HD</span>
-      <span class="badge green" id="sizeBadge">-</span>
-      <span class="badge">Telugu</span>
-    </div>
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <!-- DAILY SHOWS — copy one show-card block per episode -->
+  <!-- Replace FILESPAY, ADLINK, DIRECT, TITLE, META -->
+  <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 
-    <div class="disclaimer">
-      ⚠️ <b>Disclaimer:</b> We do not host or store any files.
-      This is an external link. We are not responsible for the content.
-    </div>
-
-    <a id="dlBtn" class="btn-dl" href="#" target="_blank">⬇ Download Now</a>
-    <a id="watchBtn" class="btn-watch" href="#">▶ Watch Online</a>
-    <a class="btn-tg" href="https://t.me/AllTeluguTvShowsWatchHere" target="_blank">📺 Join Telegram Channel</a>
-  </div>
-
-  <!-- Ad Box Middle -->
-  <div class="ad-box">
-    <div class="ad-label">Advertisement</div>
-  </div>
-
-  <div class="steps">
-    <h3>📋 How to Download</h3>
-    <div class="step">
-      <div class="step-num">1</div>
-      <div>Tap <b>Download Now</b> button above</div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div>If browser asks, tap <b>Download</b> or <b>Open</b></div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div>File saves to your <b>Downloads</b> folder</div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div>Open with <b>MX Player</b> or <b>VLC</b> to watch</div>
+  <div class="show-card">
+    <div class="show-name">Ye Devi Varamo Neevu</div>
+    <div class="show-meta">S01E37 • 480p • JHS • 150MB</div>
+    <div class="btn-row">
+      <a class="btn-watch" href="player.html?url=https%3A%2F%2F11nq.vercel.app%2Fheroku%2Fdl%2F151447%2FYe_Devi_Varamo_Neevu_S01E37.mp4&title=Ye+Devi+Varamo+Neevu+S01E37&size=150MB">▶ Watch</a>
+      <a class="btn-dl" href="download.html?link1=https%3A%2F%2Ffilespay.org%2F0oek9crqe2ld&link2=https%3A%2F%2Fwww.effectivecpmnetwork.com%2Fg76wq0uk8%3Fkey%3D7692e6337b3c7e4a5882748459c3129a&link3=https%3A%2F%2Fflowbit-848effb22be6.herokuapp.com%2Fdl%2F151447%2FYe_Devi_Varamo_Neevu_S01E37.mp4&title=Ye+Devi+Varamo+Neevu+S01E37&size=150MB">⬇ Download</a>
     </div>
   </div>
 
-  <!-- Ad Box Bottom -->
-  <div class="ad-box">
-    <div class="ad-label">Advertisement</div>
-  </div>
+  <!-- ADD MORE SHOW CARDS HERE DAILY -->
 
+</div>
+
+<div class="tg-bar">
+  <a href="https://t.me/AllTeluguTvShowsWatchHere" target="_blank">📺 Join Our Telegram Channel for Daily Updates</a>
 </div>
 
 <div class="footer">
@@ -104,25 +71,9 @@ body{background:#f5f5f5;font-family:Arial,sans-serif;color:#222}
 </div>
 
 <script>
-var params = new URLSearchParams(window.location.search);
-var url = params.get("url") || "#";
-var title = params.get("title") || "Video";
-var size = params.get("size") || "";
-
-title = decodeURIComponent(title).replace(/\+/g, " ");
-
-document.getElementById("fileTitle").innerText = title;
-document.title = title + " - Download";
-document.getElementById("dlBtn").href = decodeURIComponent(url);
-document.getElementById("watchBtn").href = "player.html?url=" + url + "&title=" + encodeURIComponent(title) + (size ? "&size=" + size : "");
-
-if (size) document.getElementById("sizeBadge").innerText = size;
-
-var q = document.getElementById("qualityBadge");
-if (title.indexOf("1080") !== -1) q.innerText = "1080p";
-else if (title.indexOf("720") !== -1) q.innerText = "720p";
-else if (title.indexOf("480") !== -1) q.innerText = "480p";
-else q.innerText = "HD";
+var d = new Date();
+var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+document.getElementById("dateBadge").innerText = d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear();
 </script>
 </body>
 </html>
