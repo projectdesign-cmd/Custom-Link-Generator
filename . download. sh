@@ -4,8 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Download</title>
-<!-- Ad Script -->
-<script src="https://www.effectivecpmnetwork.com/g76wq0uk8?key=7692e6337b3c7e4a5882748459c3129a"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#f5f5f5;font-family:Arial,sans-serif;color:#222}
@@ -20,8 +18,18 @@ body{background:#f5f5f5;font-family:Arial,sans-serif;color:#222}
 .badge.blue{background:#e3f2fd;color:#0088cc}
 .badge.green{background:#e8f5e9;color:#16a34a}
 .disclaimer{background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px 16px;font-size:13px;color:#856404;margin-bottom:16px;line-height:1.6}
-.btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#16a34a;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
+.countdown-box{background:#111;border-radius:10px;padding:24px;text-align:center;margin-bottom:16px}
+.countdown-num{font-size:52px;font-weight:bold;color:#0088cc;line-height:1}
+.countdown-txt{font-size:13px;color:#aaa;margin-top:8px}
+.progress-bar{width:100%;height:6px;background:#333;border-radius:3px;margin-top:14px;overflow:hidden}
+.progress-fill{height:100%;background:#0088cc;border-radius:3px;transition:width 1s linear}
+.method-badge{font-size:12px;padding:4px 12px;border-radius:4px;display:inline-block;margin-bottom:10px;font-weight:bold}
+.m1{background:#e8f5e9;color:#16a34a}
+.m2{background:#fff3cd;color:#856404}
+.m3{background:#fce4ec;color:#c62828}
+.btn-dl{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#16a34a;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;border:none;cursor:pointer;margin-bottom:6px}
 .btn-dl:hover{background:#15803d}
+.btn-note{font-size:12px;color:#888;text-align:center;margin-bottom:14px}
 .btn-watch{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#0088cc;color:#fff;border-radius:8px;font-size:16px;font-weight:bold;text-decoration:none;margin-bottom:10px}
 .btn-watch:hover{background:#006fa8}
 .btn-tg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;color:#0088cc;border:2px solid #0088cc;border-radius:8px;font-size:15px;font-weight:bold;text-decoration:none}
@@ -29,9 +37,7 @@ body{background:#f5f5f5;font-family:Arial,sans-serif;color:#222}
 .steps{background:#fff;border-radius:10px;padding:16px 20px;border:1px solid #e0e0e0;margin-bottom:16px}
 .steps h3{font-size:14px;color:#888;margin-bottom:10px}
 .step{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-size:13px;color:#444}
-.step-num{background:#0088cc;color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;flex-shrink:0}
-.ad-box{background:#fff;border-radius:10px;padding:16px;border:1px solid #e0e0e0;margin-bottom:16px;text-align:center;min-height:100px}
-.ad-label{font-size:11px;color:#bbb;margin-bottom:8px}
+.step-num{background:#0088cc;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;flex-shrink:0}
 .footer{text-align:center;padding:20px;font-size:12px;color:#888}
 </style>
 </head>
@@ -43,17 +49,11 @@ body{background:#f5f5f5;font-family:Arial,sans-serif;color:#222}
 </div>
 
 <div class="container">
-
-  <!-- Ad Box Top -->
-  <div class="ad-box">
-    <div class="ad-label">Advertisement</div>
-  </div>
-
   <div class="file-box">
     <div class="file-title" id="fileTitle">Loading...</div>
     <div class="file-meta">
       <span class="badge blue" id="qualityBadge">HD</span>
-      <span class="badge green" id="sizeBadge">-</span>
+      <span class="badge green" id="sizeBadge"></span>
       <span class="badge">Telugu</span>
     </div>
 
@@ -62,41 +62,45 @@ body{background:#f5f5f5;font-family:Arial,sans-serif;color:#222}
       This is an external link. We are not responsible for the content.
     </div>
 
-    <a id="dlBtn" class="btn-dl" href="#" target="_blank">⬇ Download Now</a>
+    <!-- Countdown -->
+    <div class="countdown-box" id="countdownBox">
+      <div class="countdown-num" id="countNum">15</div>
+      <div class="countdown-txt">⏳ Please wait... preparing your download</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:100%"></div>
+      </div>
+    </div>
+
+    <!-- Download section (shown after countdown) -->
+    <div id="downloadSection" style="display:none">
+      <div class="method-badge m1" id="methodBadge">✅ Download Ready</div>
+      <button class="btn-dl" onclick="startDownload()">⬇ Download Now</button>
+      <div class="btn-note" id="methodNote">Preparing best server...</div>
+    </div>
+
     <a id="watchBtn" class="btn-watch" href="#">▶ Watch Online</a>
     <a class="btn-tg" href="https://t.me/AllTeluguTvShowsWatchHere" target="_blank">📺 Join Telegram Channel</a>
-  </div>
-
-  <!-- Ad Box Middle -->
-  <div class="ad-box">
-    <div class="ad-label">Advertisement</div>
   </div>
 
   <div class="steps">
     <h3>📋 How to Download</h3>
     <div class="step">
       <div class="step-num">1</div>
-      <div>Tap <b>Download Now</b> button above</div>
+      <div>Wait for the <b>15 second</b> countdown to finish</div>
     </div>
     <div class="step">
       <div class="step-num">2</div>
-      <div>If browser asks, tap <b>Download</b> or <b>Open</b></div>
+      <div>Tap <b>Download Now</b> button</div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
-      <div>File saves to your <b>Downloads</b> folder</div>
+      <div>Complete the short <b>ad</b> to reach download</div>
     </div>
     <div class="step">
       <div class="step-num">4</div>
-      <div>Open with <b>MX Player</b> or <b>VLC</b> to watch</div>
+      <div>Open with <b>MX Player</b> or <b>VLC</b></div>
     </div>
   </div>
-
-  <!-- Ad Box Bottom -->
-  <div class="ad-box">
-    <div class="ad-label">Advertisement</div>
-  </div>
-
 </div>
 
 <div class="footer">
@@ -104,25 +108,96 @@ body{background:#f5f5f5;font-family:Arial,sans-serif;color:#222}
 </div>
 
 <script>
+// Read URL params
 var params = new URLSearchParams(window.location.search);
-var url = params.get("url") || "#";
+var link1 = params.get("link1") || "";   // FilesPlay link
+var link2 = params.get("link2") || "";   // Ad network link
+var link3 = params.get("link3") || "";   // Direct download link
 var title = params.get("title") || "Video";
-var size = params.get("size") || "";
+var size  = params.get("size")  || "";
 
 title = decodeURIComponent(title).replace(/\+/g, " ");
 
 document.getElementById("fileTitle").innerText = title;
 document.title = title + " - Download";
-document.getElementById("dlBtn").href = decodeURIComponent(url);
-document.getElementById("watchBtn").href = "player.html?url=" + url + "&title=" + encodeURIComponent(title) + (size ? "&size=" + size : "");
 
+// Watch button uses link3 (direct) for player
+var playerUrl = link3 || link2 || link1;
+document.getElementById("watchBtn").href =
+  "player.html?url=" + encodeURIComponent(playerUrl) +
+  "&title=" + encodeURIComponent(title) +
+  (size ? "&size=" + size : "");
+
+// Size & quality badges
 if (size) document.getElementById("sizeBadge").innerText = size;
-
 var q = document.getElementById("qualityBadge");
 if (title.indexOf("1080") !== -1) q.innerText = "1080p";
 else if (title.indexOf("720") !== -1) q.innerText = "720p";
 else if (title.indexOf("480") !== -1) q.innerText = "480p";
 else q.innerText = "HD";
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// COUNTDOWN — 15 seconds
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+var totalSec = 15;
+var remaining = totalSec;
+var activeLink = link1 || link2 || link3;
+
+var timer = setInterval(function() {
+  remaining--;
+  document.getElementById("countNum").innerText = remaining;
+  document.getElementById("progressFill").style.width = (remaining / totalSec * 100) + "%";
+
+  if (remaining <= 0) {
+    clearInterval(timer);
+    document.getElementById("countdownBox").style.display = "none";
+    document.getElementById("downloadSection").style.display = "block";
+    pickBestLink();
+  }
+}, 1000);
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// SMART LINK PICKER
+// Try link1 (FilesPlay) first
+// If fail → try link2 (Ad Network)
+// If fail → use link3 (Direct)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function checkUrl(url, callback) {
+  if (!url) { callback(false); return; }
+  fetch(url, { method: "HEAD", mode: "no-cors", signal: AbortSignal.timeout(4000) })
+    .then(function() { callback(true); })
+    .catch(function() { callback(false); });
+}
+
+function pickBestLink() {
+  checkUrl(link1, function(ok1) {
+    if (ok1 && link1) {
+      activeLink = link1;
+      setMethod("✅ FilesPlay Server Ready", "Via FilesPlay (Fast)", "m1");
+    } else {
+      checkUrl(link2, function(ok2) {
+        if (ok2 && link2) {
+          activeLink = link2;
+          setMethod("✅ Ad Network Server Ready", "Via Ad Network", "m2");
+        } else {
+          activeLink = link3 || link2 || link1;
+          setMethod("⚡ Direct Download Ready", "Via Direct Server (Backup)", "m3");
+        }
+      });
+    }
+  });
+}
+
+function setMethod(badge, note, cls) {
+  var b = document.getElementById("methodBadge");
+  b.innerText = badge;
+  b.className = "method-badge " + cls;
+  document.getElementById("methodNote").innerText = note;
+}
+
+function startDownload() {
+  if (activeLink) window.open(activeLink, "_blank");
+}
 </script>
 </body>
 </html>
